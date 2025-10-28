@@ -14,6 +14,7 @@ def setup_database(DB_path):
     cursor.executescript("""
     CREATE TABLE IF NOT EXISTS articles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        status TEXT DEFAULT 'PENDING' CHECK(status IN ('FAILED', 'PENDING', 'SENT')),
         title TEXT NOT NULL,
         link TEXT NOT NULL UNIQUE,
         summary TEXT,
