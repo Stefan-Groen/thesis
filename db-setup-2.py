@@ -2,7 +2,8 @@ import sqlite3
 from pathlib import Path
 
 # database path
-DB_path = Path("/Users/stefan/Documents/thesis_code/rss_DB.db")
+DB_name = 'thesis'
+DB_path = Path(f"/Users/stefan/Documents/thesis_code/{DB_name}.db")
 
 def setup_database(DB_path):
     
@@ -20,7 +21,11 @@ def setup_database(DB_path):
         summary TEXT,
         date_published TEXT,
         source TEXT,
-        added_at TEXT DEFAULT CURRENT_TIMESTAMP
+        date_added TEXT DEFAULT CURRENT_TIMESTAMP,
+        classification TEXT DEFAULT '' CHECK(classification IN ('Threat','Opportunity','Neutral','')),
+        explanation TEXT DEFAULT '',
+        pdf TEXT DEFAULT ''
+            
     );
     """)
 
@@ -34,4 +39,3 @@ if __name__ == "__main__":
     setup_database(DB_path)
 
                          
-                        

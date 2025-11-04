@@ -2,6 +2,25 @@ import sqlite3
 from pathlib import Path
 import aiohttp
 import asyncio
+import json
+
+
+def ensure_classification_column(DB_path):
+    """ Ensure the classification_response column exists in the articles table. """
+    connect = sqlite3.connect(DB_path)
+    cursor = connect.cursor()
+    
+    # Check if column exists
+    cursor.execute("PRAGMA table_info(articles)")
+    columns = [column[1] for column in cursor.fetchall()]
+    
+    if 'classification_response' not in columns:
+        # Add the column if it doesn't exist
+        cursor.execute("ALTER TABLE articles ADD COLUMN classification_response TEXT")
+        connect.commit()
+        print("Added classification_response column to articles table")
+    
+    connect.close()
 
 
 def get_pending_entries(DB_path):
@@ -55,9 +74,39 @@ async def send_to_chutes(session, title, summary, API_KEY):
 
 
 
-async def prepare_for_LLM(pending_entries, API_KEY):
+def save_classification_to_db(DB_path, article_id, classification_data, status='SENT'):
+    """ Save the classification response to the database and update the article status. """
+    connect = sqlite3.connect(DB_path)
+    cursor = connect.cursor()
+    
+    # Extract the classification content from the response
+    classification_content = None
+    if classification_data and "choices" in classification_data and len(classification_data["choices"]) > 0:
+        classification_content = classification_data["choices"][0]["message"]["content"]
+    
+    # Store the full response as JSON, and also extract the content for easier access
+    classification_json = json.dumps(classification_data) if classification_data else None
+    
+    # Update the article with classification response and status
+    cursor.execute("""
+        UPDATE articles 
+        SET classification_response = ?, 
+            status = ? 
+        WHERE id = ?
+    """, (classification_json, status, article_id))
+    
+    connect.commit()
+    connect.close()
+    
+    return classification_content
+
+
+async def prepare_for_LLM(pending_entries, API_KEY, DB_path):
     ''' prepares the new entries for classification and sends them one by one to LLM'''
 
+    # Ensure the classification_response column exists
+    ensure_classification_column(DB_path)
+    
     # Setup http session for API calls to chutes (efficient connection reuse)
     async with aiohttp.ClientSession() as session:
         # for every pending entry, extract the relevant fields and send to chutes
@@ -75,12 +124,20 @@ async def prepare_for_LLM(pending_entries, API_KEY):
             try:
                 # Send to chutes for classification
                 classification = await send_to_chutes(session, title, summary or "", API_KEY)
-                print("Classification Result:")
+                
                 if classification:
-                    print(classification)    # removed .strip()
+                    # Save classification to database
+                    classification_content = save_classification_to_db(DB_path, id_original_db, classification, status='SENT')
+                    print("Classification Result:")
+                    print(classification_content if classification_content else "Saved but content was empty")
+                    print(f"✓ Saved classification for article ID {id_original_db}")
                 else:
+                    # Mark as failed if no classification received
+                    save_classification_to_db(DB_path, id_original_db, None, status='FAILED')
                     print(f"[WARN] id={id_original_db}: API returned an empty classification (None).")
             except Exception as e:
+                # Mark as failed on error
+                save_classification_to_db(DB_path, id_original_db, None, status='FAILED')
                 print(f"[ERROR] id={id_original_db}: {e}")
 
 
@@ -101,7 +158,7 @@ def main():
     # Sent the pending entries to prepare_for_LLM function, only if there are pending entries
     if pending_entries:
         print(f'Found {len(pending_entries)} pending entries for classification.')
-        asyncio.run(prepare_for_LLM(pending_entries, API_KEY))
+        asyncio.run(prepare_for_LLM(pending_entries, API_KEY, DB_path))
     else:
         print("No new entries found")
 
