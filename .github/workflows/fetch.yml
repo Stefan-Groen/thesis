@@ -5,7 +5,7 @@ name: Fetch RSS Feeds
 on:
   workflow_dispatch:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 */2 * * *'
 
 # This defines the job that will run
 jobs:
