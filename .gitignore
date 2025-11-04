@@ -1,2 +1,11 @@
+# keep environment variables out
 .env
+
+# ignore compiled python files
 __pycache__/
+
+# Ignore macOS system files 
+.DS_Store
+
+# Ignore old, local-only scripts
+fetch_rss_feeds.py
