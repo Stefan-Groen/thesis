@@ -1,0 +1,114 @@
+/**
+ * API Route: /api/articles
+ *
+ * Returns a list of articles with their classifications.
+ * Supports pagination and filtering.
+ *
+ * Query parameters:
+ * - limit: Number of articles per page (default: 50)
+ * - offset: Number of articles to skip (default: 0)
+ * - classification: Filter by classification type (optional)
+ *
+ * Example usage:
+ * - /api/articles?limit=10&offset=0
+ * - /api/articles?classification=Threat
+ *
+ * Python Flask equivalent:
+ * ```python
+ * @app.route('/api/articles')
+ * def get_articles():
+ *     limit = request.args.get('limit', 50)
+ *     offset = request.args.get('offset', 0)
+ *     cursor.execute("SELECT * FROM articles LIMIT %s OFFSET %s", (limit, offset))
+ *     articles = cursor.fetchall()
+ *     return jsonify(articles)
+ * ```
+ */
+
+import { NextRequest, NextResponse } from 'next/server'
+import { query } from '@/lib/db'
+
+export async function GET(request: NextRequest) {
+  try {
+    // Get query parameters from URL
+    // In Python: request.args.get('limit')
+    const { searchParams } = new URL(request.url)
+    const limit = parseInt(searchParams.get('limit') || '50', 10)
+    const offset = parseInt(searchParams.get('offset') || '0', 10)
+    const classificationFilter = searchParams.get('classification')
+
+    // Build SQL query dynamically based on filters
+    let sql = `
+      SELECT
+        id,
+        title,
+        link,
+        summary,
+        source,
+        classification,
+        explanation,
+        date_published,
+        classification_date,
+        status
+      FROM articles
+    `
+
+    // Array to hold query parameters (prevents SQL injection!)
+    const params: any[] = []
+    let paramIndex = 1
+
+    // Add classification filter if provided
+    if (classificationFilter) {
+      sql += ` WHERE classification = $${paramIndex}`
+      params.push(classificationFilter)
+      paramIndex++
+    }
+
+    // Order by most recent first
+    sql += ` ORDER BY date_published DESC NULLS LAST`
+
+    // Add pagination
+    sql += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
+    params.push(limit, offset)
+
+    // Execute query
+    const result = await query(sql, params)
+
+    // Also get the total count for pagination
+    let countSql = `SELECT COUNT(*) as total FROM articles`
+    const countParams: any[] = []
+
+    if (classificationFilter) {
+      countSql += ` WHERE classification = $1`
+      countParams.push(classificationFilter)
+    }
+
+    const countResult = await query(countSql, countParams)
+    const total = Number(countResult.rows[0].total)
+
+    // Format dates to ISO strings (easier to work with in JavaScript)
+    const articles = result.rows.map((article) => ({
+      ...article,
+      date_published: article.date_published?.toISOString() || null,
+      classification_date: article.classification_date?.toISOString() || null,
+    }))
+
+    // Return articles with pagination metadata
+    return NextResponse.json({
+      articles,
+      pagination: {
+        total,
+        limit,
+        offset,
+        hasMore: offset + limit < total,
+      },
+    })
+
+  } catch (error) {
+    console.error('Error fetching articles:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch articles' },
+      { status: 500 }
+    )
+  }
+}

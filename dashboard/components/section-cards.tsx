@@ -1,4 +1,23 @@
-import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react"
+/**
+ * SectionCards Component
+ *
+ * Displays summary statistics as cards:
+ * - Total Articles
+ * - Threats
+ * - Opportunities
+ * - Neutral
+ *
+ * This component receives stats as props (like function parameters in Python)
+ *
+ * Python equivalent:
+ * ```python
+ * def section_cards(stats: Stats):
+ *     return render_template('cards.html', stats=stats)
+ * ```
+ */
+
+import { IconAlertTriangle, IconSparkles, IconNews, IconCircle } from "@tabler/icons-react"
+import type { Stats } from "@/lib/types"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -10,91 +29,122 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 
-export function SectionCards() {
+// Props interface (like function parameters with type hints)
+interface SectionCardsProps {
+  stats: Stats
+}
+
+export function SectionCards({ stats }: SectionCardsProps) {
+  // Calculate percentage of each classification
+  const threatPercentage = stats.total > 0
+    ? ((stats.threats / stats.total) * 100).toFixed(1)
+    : '0.0'
+
+  const opportunityPercentage = stats.total > 0
+    ? ((stats.opportunities / stats.total) * 100).toFixed(1)
+    : '0.0'
+
+  const neutralPercentage = stats.total > 0
+    ? ((stats.neutral / stats.total) * 100).toFixed(1)
+    : '0.0'
+
   return (
     <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      {/* Total Articles Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
+          <CardDescription>Total Articles</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+            {stats.total.toLocaleString()}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
+              <IconNews className="size-4" />
+              All Time
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <IconTrendingUp className="size-4" />
+            Total articles in database
           </div>
           <div className="text-muted-foreground">
-            Visitors for the last 6 months
+            {stats.unclassified > 0
+              ? `${stats.unclassified} unclassified`
+              : 'All articles classified'}
           </div>
         </CardFooter>
       </Card>
+
+      {/* Threats Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>Threats</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            {stats.threats.toLocaleString()}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <IconTrendingDown />
-              -20%
+            <Badge variant="outline" className="text-red-600 dark:text-red-400">
+              <IconAlertTriangle className="size-4" />
+              {threatPercentage}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <IconTrendingDown className="size-4" />
+            Articles classified as threats
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+            Requires attention from management
           </div>
         </CardFooter>
       </Card>
+
+      {/* Opportunities Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
+          <CardDescription>Opportunities</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            {stats.opportunities.toLocaleString()}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +12.5%
+            <Badge variant="outline" className="text-green-600 dark:text-green-400">
+              <IconSparkles className="size-4" />
+              {opportunityPercentage}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <IconTrendingUp className="size-4" />
+            Positive opportunities identified
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-muted-foreground">
+            Potential areas for growth
+          </div>
         </CardFooter>
       </Card>
+
+      {/* Neutral Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
+          <CardDescription>Neutral</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+            {stats.neutral.toLocaleString()}
           </CardTitle>
           <CardAction>
-            <Badge variant="outline">
-              <IconTrendingUp />
-              +4.5%
+            <Badge variant="outline" className="text-blue-600 dark:text-blue-400">
+              <IconCircle className="size-4" />
+              {neutralPercentage}%
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase <IconTrendingUp className="size-4" />
+            Informational articles
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-muted-foreground">
+            No immediate action required
+          </div>
         </CardFooter>
       </Card>
     </div>
