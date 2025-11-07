@@ -128,7 +128,7 @@ def update_database(article_id: int, classification: str, explanation: str, reas
     
     sql = """
         UPDATE articles
-        SET classification = %s, explanation = %s, reasoning = %s, status = %s
+        SET classification = %s, explanation = %s, reasoning = %s, status = %s, classification_date = NOW()
         WHERE id = %s
     """
 
