@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS articles (
   id                  SERIAL PRIMARY KEY,
-  status              TEXT DEFAULT 'PENDING'
+  status              TEXT DEFAULT 'PENDING',
   title               TEXT NOT NULL,
   link                TEXT NOT NULL UNIQUE,
   summary             TEXT,
