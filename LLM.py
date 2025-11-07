@@ -4,7 +4,21 @@ from dotenv import load_dotenv
 import aiohttp
 import asyncio
 import json
+from prompt_config import get_api_config, get_classification_prompt
 
+
+def load_company_context():
+    """
+    Load case/company context from file
+    """
+
+    try:
+        with open('company_case.txt', 'r', encoding='utf-8') as f:
+            print("Company context succesfully loaded")
+            return f.read()
+    except FileNotFoundError:
+        print("company_case.txt file not found.")
+        return ""
 
 
 def get_pending_entries(limit: int | None = None):
@@ -45,39 +59,16 @@ def get_pending_entries(limit: int | None = None):
     # ]
 
 
-async def classify_article(session, title: str, summary: str, api_key: str):
+async def classify_article(session, title: str, summary: str, api_key: str, company_context: str):
     """
     Sends a single article to Chutes LLM for classification
     Returns the classiciation result and explanation
     """
 
-    url = "https://llm.chutes.ai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-
-    body = {
-        "model": "deepseek-ai/DeepSeek-R1",
-        "messages": [
-                    {
-                        "role": "user",
-                        "content": f"""Analyze this news article for JUMBO Supermarkten (a major Dutch supermarket chain).
-                        Title: {title}
-                        Summary: {summary}
-                        Classify this article as either:
-                        - Threat: Could negatively impact JUMBO's business, reputation, or operations
-                        - Opportunity: Could benefit JUMBO or presents a business opportunity
-                        - Neutral: No significant impact on JUMBO
-                        Provide your response in the following format:
-                        Classification: [Threat/Opportunity/Neutral]
-                        Explanation: [Brief explanation of why this matters or doesn't matter to JUMBO]"""
-            }
-        ],
-        "stream" : False,
-        "max_tokens": 2048,
-        "temperature": 0.5
-    }
+    api_config = get_api_config(api_key)
+    url = api_config['url']
+    headers = api_config['headers']
+    body = get_classification_prompt(company_context, title, summary)
 
     try:
         async with session.post(url, headers=headers, json=body) as response:
@@ -89,10 +80,10 @@ async def classify_article(session, title: str, summary: str, api_key: str):
             return content, reasoning, finish_reason
     except aiohttp.ClientError as e:
         print(f"API Request failed: {e}")
-        return None
+        return None, None, None
     except Exception as e: 
         print(f"Unexpected error during classification: {e}")
-        return None
+        return None, None, None
 
 
 def parse_llm_response(response: str):
@@ -156,6 +147,9 @@ async def main():
     Main function - fetches new articles from database and classifies them 
     """
 
+    # load company case/context
+    COMPANY_CONTEXT = load_company_context()
+
     # Load the API KEY from the environment variables
     load_dotenv()
     CHUTES_API_KEY = os.getenv('CHUTES_API_KEY')
@@ -185,7 +179,7 @@ async def main():
             print(f'Processing article {counter} of {len(new_entries)}   (ID): {article_id}: {title[:30]} ...')
             counter += 1
 
-            result = await classify_article(session, title, summary, CHUTES_API_KEY)
+            result = await classify_article(session, title, summary, CHUTES_API_KEY, COMPANY_CONTEXT)
             
             if result:
                 llm_response_content, llm_response_reasoning, finish_reason = result
