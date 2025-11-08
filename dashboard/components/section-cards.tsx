@@ -50,62 +50,59 @@ export function SectionCards({ stats }: SectionCardsProps) {
     : '0.0'
 
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {/* Total Articles - Two stacked cards */}
-      <div className="flex flex-col gap-4">
-        {/* Total Articles Card - Clickable */}
-        <Link href="/dashboard/articles" className="@container/card">
-          <Card className="cursor-pointer transition-all hover:bg-muted/50">
-            <CardHeader>
-              <CardDescription>Total Articles</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                {stats.total.toLocaleString()}
-              </CardTitle>
-              <CardAction>
-                <Badge variant="outline">
-                  <IconNews className="size-4" />
-                  All Time
-                </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
-              <div className="line-clamp-1 flex gap-2 font-medium">
-                Total articles in database
-              </div>
-              <div className="text-muted-foreground">
-                Click to view all articles
-              </div>
-            </CardFooter>
-          </Card>
-        </Link>
-
-        {/* Articles Added Today Card */}
-        <Card className="@container/card">
+    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
+      {/* Total Articles Card - Clickable (Half size) */}
+      <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-1">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
           <CardHeader>
-            <CardDescription>Added Today</CardDescription>
+            <CardDescription>Total Articles</CardDescription>
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.articlesToday.toLocaleString()}
+              {stats.total.toLocaleString()}
             </CardTitle>
             <CardAction>
               <Badge variant="outline">
-                <IconCalendarEvent className="size-4" />
-                Today
+                <IconNews className="size-4" />
+                All Time
               </Badge>
             </CardAction>
           </CardHeader>
           <CardFooter className="flex-col items-start gap-1.5 text-sm">
             <div className="line-clamp-1 flex gap-2 font-medium">
-              Articles published today
+              Total articles in database
             </div>
             <div className="text-muted-foreground">
-              Based on publication date
+              Click to view all articles
             </div>
           </CardFooter>
         </Card>
-      </div>
+      </Link>
+
+      {/* Articles Added Today Card (Half size) */}
+      <Card className="@container/card @5xl/main:col-span-1">
+        <CardHeader>
+          <CardDescription>Added Today</CardDescription>
+          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+            {stats.articlesToday.toLocaleString()}
+          </CardTitle>
+          <CardAction>
+            <Badge variant="outline">
+              <IconCalendarEvent className="size-4" />
+              Today
+            </Badge>
+          </CardAction>
+        </CardHeader>
+        <CardFooter className="flex-col items-start gap-1.5 text-sm">
+          <div className="line-clamp-1 flex gap-2 font-medium">
+            Articles published today
+          </div>
+          <div className="text-muted-foreground">
+            Based on publication date
+          </div>
+        </CardFooter>
+      </Card>
 
       {/* Threats Card - Clickable */}
-      <Link href="/dashboard/threats" className="@container/card">
+      <Link href="/dashboard/threats" className="@container/card @5xl/main:col-span-2">
         <Card className="cursor-pointer transition-all hover:bg-muted/50">
           <CardHeader>
             <CardDescription>Threats</CardDescription>
@@ -131,7 +128,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
       </Link>
 
       {/* Opportunities Card - Clickable */}
-      <Link href="/dashboard/opportunities" className="@container/card">
+      <Link href="/dashboard/opportunities" className="@container/card @5xl/main:col-span-2">
         <Card className="cursor-pointer transition-all hover:bg-muted/50">
           <CardHeader>
             <CardDescription>Opportunities</CardDescription>
@@ -157,7 +154,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
       </Link>
 
       {/* Neutral Card - Clickable */}
-      <Link href="/dashboard/neutral" className="@container/card">
+      <Link href="/dashboard/neutral" className="@container/card @5xl/main:col-span-2">
         <Card className="cursor-pointer transition-all hover:bg-muted/50">
           <CardHeader>
             <CardDescription>Neutral</CardDescription>
