@@ -35,6 +35,7 @@ export interface Article {
   source: string | null
   classification: 'Threat' | 'Opportunity' | 'Neutral' | 'Error: Unknown' | ''
   explanation: string | null
+  reasoning: string | null
   date_published: string | null
   classification_date: string | null
   status: string
@@ -45,6 +46,20 @@ export interface ChartDataPoint {
   date: string
   threats: number
   opportunities: number
+}
+
+// Activity data point (for line chart - published vs classified)
+export interface ActivityDataPoint {
+  date: string
+  published: number
+  classified: number
+}
+
+// Dashboard metrics
+export interface Metrics {
+  backlog: number
+  serviceLevel: number
+  ownArticles: number
 }
 
 // API response types
