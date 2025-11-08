@@ -1,8 +1,9 @@
 /**
- * ChartAreaInteractive Component
+ * ChartBarInteractive Component
  *
- * Displays a time-series area chart showing article classification trends.
- * Shows three data series: Threats (red), Opportunities (green), Neutral (blue)
+ * Displays a multiple bar chart showing article classification trends.
+ * Shows two data series: Threats (red) and Opportunities (green)
+ * Based on classification_date (when articles were classified by the LLM)
  *
  * This component receives chart data as props and allows filtering by time range.
  */
@@ -10,7 +11,7 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 import type { ChartDataPoint } from "@/lib/types"
 
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -50,19 +51,15 @@ const chartConfig = {
     label: "Opportunities",
     color: "hsl(142, 76%, 36%)", // Green color for opportunities
   },
-  neutral: {
-    label: "Neutral",
-    color: "hsl(221, 83%, 53%)", // Blue color for neutral
-  },
 } satisfies ChartConfig
 
-interface ChartAreaInteractiveProps {
+interface ChartBarInteractiveProps {
   data: ChartDataPoint[]
 }
 
-export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractiveProps) {
+export function ChartAreaInteractive({ data: chartData }: ChartBarInteractiveProps) {
   const isMobile = useIsMobile()
-  const [timeRange, setTimeRange] = React.useState("30d")
+  const [timeRange, setTimeRange] = React.useState("7d") // Default to 7 days (1 week)
 
   // Set initial time range based on screen size
   React.useEffect(() => {
@@ -76,12 +73,12 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
     if (chartData.length === 0) return []
 
     const now = new Date()
-    let daysToSubtract = 30
+    let daysToSubtract = 7 // Default: 1 week
 
     if (timeRange === "90d") {
-      daysToSubtract = 90
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7
+      daysToSubtract = 90 // 3 months
+    } else if (timeRange === "30d") {
+      daysToSubtract = 30 // 1 month
     }
 
     const startDate = new Date(now)
@@ -99,7 +96,7 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
         <CardTitle>Article Classification Trends</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Daily article classifications over time
+            Daily classified threats and opportunities based on classification date
           </span>
           <span className="@[540px]/card:hidden">Classification trends</span>
         </CardDescription>
@@ -111,9 +108,9 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
             variant="outline"
             className="hidden *:data-[slot=toggle-group-item]:!px-4 @[767px]/card:flex"
           >
-            <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
-            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
             <ToggleGroupItem value="7d">Last 7 days</ToggleGroupItem>
+            <ToggleGroupItem value="30d">Last 30 days</ToggleGroupItem>
+            <ToggleGroupItem value="90d">Last 3 months</ToggleGroupItem>
           </ToggleGroup>
           <Select value={timeRange} onValueChange={setTimeRange}>
             <SelectTrigger
@@ -121,17 +118,17 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
               size="sm"
               aria-label="Select a value"
             >
-              <SelectValue placeholder="Last 30 days" />
+              <SelectValue placeholder="Last 7 days" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
-              <SelectItem value="90d" className="rounded-lg">
-                Last 3 months
+              <SelectItem value="7d" className="rounded-lg">
+                Last 7 days
               </SelectItem>
               <SelectItem value="30d" className="rounded-lg">
                 Last 30 days
               </SelectItem>
-              <SelectItem value="7d" className="rounded-lg">
-                Last 7 days
+              <SelectItem value="90d" className="rounded-lg">
+                Last 3 months
               </SelectItem>
             </SelectContent>
           </Select>
@@ -149,52 +146,13 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
             config={chartConfig}
             className="aspect-auto h-[250px] w-full"
           >
-            <AreaChart data={filteredData}>
-              <defs>
-                <linearGradient id="fillThreats" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-threats)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-threats)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillOpportunities" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-opportunities)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-opportunities)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-                <linearGradient id="fillNeutral" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-neutral)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-neutral)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
+            <BarChart accessibilityLayer data={filteredData}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"
                 tickLine={false}
+                tickMargin={10}
                 axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
                 tickFormatter={(value) => {
                   const date = new Date(value)
                   return date.toLocaleDateString("en-US", {
@@ -207,6 +165,7 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
                 cursor={false}
                 content={
                   <ChartTooltipContent
+                    indicator="dashed"
                     labelFormatter={(value) => {
                       return new Date(value).toLocaleDateString("en-US", {
                         month: "short",
@@ -214,35 +173,20 @@ export function ChartAreaInteractive({ data: chartData }: ChartAreaInteractivePr
                         year: "numeric",
                       })
                     }}
-                    indicator="dot"
                   />
                 }
               />
-              <Area
+              <Bar
                 dataKey="threats"
-                type="natural"
-                fill="url(#fillThreats)"
-                stroke="var(--color-threats)"
-                strokeWidth={2}
-                stackId="a"
+                fill="var(--color-threats)"
+                radius={4}
               />
-              <Area
+              <Bar
                 dataKey="opportunities"
-                type="natural"
-                fill="url(#fillOpportunities)"
-                stroke="var(--color-opportunities)"
-                strokeWidth={2}
-                stackId="a"
+                fill="var(--color-opportunities)"
+                radius={4}
               />
-              <Area
-                dataKey="neutral"
-                type="natural"
-                fill="url(#fillNeutral)"
-                stroke="var(--color-neutral)"
-                strokeWidth={2}
-                stackId="a"
-              />
-            </AreaChart>
+            </BarChart>
           </ChartContainer>
         )}
       </CardContent>

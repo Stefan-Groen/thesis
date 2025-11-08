@@ -40,12 +40,11 @@ export interface Article {
   status: string
 }
 
-// Chart data point
+// Chart data point (for bar chart - only threats and opportunities)
 export interface ChartDataPoint {
   date: string
   threats: number
   opportunities: number
-  neutral: number
 }
 
 // API response types

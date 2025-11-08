@@ -1,21 +1,23 @@
 /**
  * API Route: /api/chart-data
  *
- * Returns time-series data for the classification trend chart.
- * Groups articles by date and classification type.
+ * Returns time-series data for the classification trend bar chart.
+ * Groups articles by classification date (when they were classified, not published).
+ * Returns only Threats and Opportunities (excludes Neutral).
  *
  * Query parameters:
- * - days: Number of days to show (default: 30)
+ * - days: Number of days to show (default: 7)
  * - interval: Grouping interval - 'day', 'week', or 'month' (default: 'day')
  *
  * Example usage:
  * - /api/chart-data?days=7&interval=day
- * - /api/chart-data?days=90&interval=week
+ * - /api/chart-data?days=30&interval=day
+ * - /api/chart-data?days=90&interval=day
  *
  * Returns data format:
  * [
- *   { date: '2024-01-01', threats: 5, opportunities: 3, neutral: 2 },
- *   { date: '2024-01-02', threats: 7, opportunities: 4, neutral: 1 },
+ *   { date: '2024-01-01', threats: 5, opportunities: 3 },
+ *   { date: '2024-01-02', threats: 7, opportunities: 4 },
  *   ...
  * ]
  */
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
   try {
     // Get query parameters
     const { searchParams } = new URL(request.url)
-    const days = parseInt(searchParams.get('days') || '30', 10)
+    const days = parseInt(searchParams.get('days') || '7', 10) // Changed default to 7 days
     const interval = searchParams.get('interval') || 'day'
 
     // Validate interval parameter
@@ -40,21 +42,21 @@ export async function GET(request: NextRequest) {
 
     // Determine the date truncation function based on interval
     // date_trunc() groups dates by day, week, or month
-    const truncFunc = `date_trunc('${interval}', date_published)`
+    // Using classification_date instead of date_published
+    const truncFunc = `date_trunc('${interval}', classification_date)`
 
-    // SQL query to get counts grouped by date and classification
-    // This creates a pivot table with dates as rows and classifications as columns
+    // SQL query to get counts grouped by classification date
+    // Only includes Threats and Opportunities (excludes Neutral)
     const sql = `
       SELECT
         ${truncFunc}::date as date,
         COUNT(*) FILTER (WHERE classification = 'Threat') as threats,
-        COUNT(*) FILTER (WHERE classification = 'Opportunity') as opportunities,
-        COUNT(*) FILTER (WHERE classification = 'Neutral') as neutral
+        COUNT(*) FILTER (WHERE classification = 'Opportunity') as opportunities
       FROM articles
       WHERE
-        date_published >= NOW() - INTERVAL '${days} days'
-        AND date_published IS NOT NULL
-        AND classification IN ('Threat', 'Opportunity', 'Neutral')
+        classification_date >= NOW() - INTERVAL '${days} days'
+        AND classification_date IS NOT NULL
+        AND classification IN ('Threat', 'Opportunity')
       GROUP BY ${truncFunc}
       ORDER BY date ASC;
     `
@@ -67,7 +69,6 @@ export async function GET(request: NextRequest) {
       date: row.date?.toISOString().split('T')[0] || '', // Format as YYYY-MM-DD
       threats: Number(row.threats),
       opportunities: Number(row.opportunities),
-      neutral: Number(row.neutral),
     }))
 
     // If no data, return an empty array (chart will show "no data" message)

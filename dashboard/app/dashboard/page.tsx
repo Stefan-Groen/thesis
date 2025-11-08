@@ -61,12 +61,13 @@ async function getStats(): Promise<Stats> {
 
 /**
  * Fetch chart data from our API
+ * Fetches 90 days of data so the client-side component can filter for 7/30/90 day views
  */
 async function getChartData(): Promise<ChartDataPoint[]> {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
-    const res = await fetch(`${baseUrl}/api/chart-data?days=30`, {
+    const res = await fetch(`${baseUrl}/api/chart-data?days=90`, {
       next: { revalidate: 60 }
     })
 
