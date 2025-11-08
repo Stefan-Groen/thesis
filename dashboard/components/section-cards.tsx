@@ -77,29 +77,31 @@ export function SectionCards({ stats }: SectionCardsProps) {
         </Card>
       </Link>
 
-      {/* Articles Added Today Card (Half size) */}
-      <Card className="@container/card @5xl/main:col-span-1">
-        <CardHeader>
-          <CardDescription>Added Today</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.articlesToday.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <IconCalendarEvent className="size-4" />
-              Today
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Articles published today
-          </div>
-          <div className="text-muted-foreground">
-            Based on publication date
-          </div>
-        </CardFooter>
-      </Card>
+      {/* Articles Added Today Card (Half size) - Clickable */}
+      <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-1">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
+          <CardHeader>
+            <CardDescription>Added Today</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.articlesToday.toLocaleString()}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline">
+                <IconCalendarEvent className="size-4" />
+                Today
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              Articles published today
+            </div>
+            <div className="text-muted-foreground">
+              Click to view today's articles
+            </div>
+          </CardFooter>
+        </Card>
+      </Link>
 
       {/* Threats Card - Clickable */}
       <Link href="/dashboard/threats" className="@container/card @5xl/main:col-span-2">
