@@ -13,7 +13,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconChevronsUpDown } from "@tabler/icons-react"
+import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
 
 import { Badge } from "@/components/ui/badge"
@@ -123,7 +123,7 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   // Helper to render sort icon
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
-      return <IconChevronsUpDown className="size-4 ml-1 text-muted-foreground" />
+      return <IconSelector className="size-4 ml-1 text-muted-foreground" />
     }
     if (sortDirection === 'asc') {
       return <IconChevronUp className="size-4 ml-1" />
