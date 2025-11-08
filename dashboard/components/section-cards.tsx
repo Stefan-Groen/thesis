@@ -3,9 +3,9 @@
  *
  * Displays summary statistics as cards:
  * - Total Articles
- * - Threats
- * - Opportunities
- * - Neutral
+ * - Threats (clickable → /dashboard/threats)
+ * - Opportunities (clickable → /dashboard/opportunities)
+ * - Neutral (clickable → /dashboard/neutral)
  *
  * This component receives stats as props (like function parameters in Python)
  *
@@ -16,6 +16,7 @@
  * ```
  */
 
+import Link from "next/link"
 import { IconAlertTriangle, IconSparkles, IconNews, IconCircle } from "@tabler/icons-react"
 import type { Stats } from "@/lib/types"
 
@@ -76,77 +77,83 @@ export function SectionCards({ stats }: SectionCardsProps) {
         </CardFooter>
       </Card>
 
-      {/* Threats Card */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Threats</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.threats.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-red-600 dark:text-red-400">
-              <IconAlertTriangle className="size-4" />
-              {threatPercentage}%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Articles classified as threats
-          </div>
-          <div className="text-muted-foreground">
-            Requires attention from management
-          </div>
-        </CardFooter>
-      </Card>
+      {/* Threats Card - Clickable */}
+      <Link href="/dashboard/threats" className="@container/card">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
+          <CardHeader>
+            <CardDescription>Threats</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.threats.toLocaleString()}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline" className="text-red-600 dark:text-red-400">
+                <IconAlertTriangle className="size-4" />
+                {threatPercentage}%
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              Articles classified as threats
+            </div>
+            <div className="text-muted-foreground">
+              Click to view all threats
+            </div>
+          </CardFooter>
+        </Card>
+      </Link>
 
-      {/* Opportunities Card */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Opportunities</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.opportunities.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-green-600 dark:text-green-400">
-              <IconSparkles className="size-4" />
-              {opportunityPercentage}%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Positive opportunities identified
-          </div>
-          <div className="text-muted-foreground">
-            Potential areas for growth
-          </div>
-        </CardFooter>
-      </Card>
+      {/* Opportunities Card - Clickable */}
+      <Link href="/dashboard/opportunities" className="@container/card">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
+          <CardHeader>
+            <CardDescription>Opportunities</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.opportunities.toLocaleString()}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline" className="text-green-600 dark:text-green-400">
+                <IconSparkles className="size-4" />
+                {opportunityPercentage}%
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              Positive opportunities identified
+            </div>
+            <div className="text-muted-foreground">
+              Click to view all opportunities
+            </div>
+          </CardFooter>
+        </Card>
+      </Link>
 
-      {/* Neutral Card */}
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Neutral</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            {stats.neutral.toLocaleString()}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline" className="text-blue-600 dark:text-blue-400">
-              <IconCircle className="size-4" />
-              {neutralPercentage}%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Informational articles
-          </div>
-          <div className="text-muted-foreground">
-            No immediate action required
-          </div>
-        </CardFooter>
-      </Card>
+      {/* Neutral Card - Clickable */}
+      <Link href="/dashboard/neutral" className="@container/card">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
+          <CardHeader>
+            <CardDescription>Neutral</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.neutral.toLocaleString()}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline" className="text-blue-600 dark:text-blue-400">
+                <IconCircle className="size-4" />
+                {neutralPercentage}%
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              Informational articles
+            </div>
+            <div className="text-muted-foreground">
+              Click to view all neutral articles
+            </div>
+          </CardFooter>
+        </Card>
+      </Link>
     </div>
   )
 }

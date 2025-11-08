@@ -3,7 +3,7 @@
  *
  * Displays a multiple bar chart showing article classification trends.
  * Shows two data series: Threats (red) and Opportunities (green)
- * Based on classification_date (when articles were classified by the LLM)
+ * Based on date_published (when articles were published)
  *
  * This component receives chart data as props and allows filtering by time range.
  */
@@ -96,7 +96,7 @@ export function ChartAreaInteractive({ data: chartData }: ChartBarInteractivePro
         <CardTitle>Article Classification Trends</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Daily classified threats and opportunities based on classification date
+            Daily classified threats and opportunities based on publication date
           </span>
           <span className="@[540px]/card:hidden">Classification trends</span>
         </CardDescription>

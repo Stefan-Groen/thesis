@@ -2,7 +2,7 @@
  * API Route: /api/chart-data
  *
  * Returns time-series data for the classification trend bar chart.
- * Groups articles by classification date (when they were classified, not published).
+ * Groups articles by publication date (when articles were published).
  * Returns only Threats and Opportunities (excludes Neutral).
  *
  * Query parameters:
@@ -42,10 +42,10 @@ export async function GET(request: NextRequest) {
 
     // Determine the date truncation function based on interval
     // date_trunc() groups dates by day, week, or month
-    // Using classification_date instead of date_published
-    const truncFunc = `date_trunc('${interval}', classification_date)`
+    // Using date_published (when article was published)
+    const truncFunc = `date_trunc('${interval}', date_published)`
 
-    // SQL query to get counts grouped by classification date
+    // SQL query to get counts grouped by publication date
     // Only includes Threats and Opportunities (excludes Neutral)
     const sql = `
       SELECT
@@ -54,8 +54,8 @@ export async function GET(request: NextRequest) {
         COUNT(*) FILTER (WHERE classification = 'Opportunity') as opportunities
       FROM articles
       WHERE
-        classification_date >= NOW() - INTERVAL '${days} days'
-        AND classification_date IS NOT NULL
+        date_published >= NOW() - INTERVAL '${days} days'
+        AND date_published IS NOT NULL
         AND classification IN ('Threat', 'Opportunity')
       GROUP BY ${truncFunc}
       ORDER BY date ASC;
