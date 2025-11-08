@@ -1,11 +1,12 @@
 /**
- * User Uploaded Page
+ * All Articles Page
  *
- * Displays all articles uploaded by the user (source: imported or uploaded).
+ * Displays all articles in the database.
+ * Uses Server Components to fetch data from the API.
  */
 
 import Link from "next/link"
-import { IconArrowLeft, IconUser } from "@tabler/icons-react"
+import { IconArrowLeft, IconNews } from "@tabler/icons-react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { FilteredArticlesTable } from "@/components/filtered-articles-table"
 import { SiteHeader } from "@/components/site-header"
@@ -16,38 +17,32 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import type { Article } from "@/lib/types"
-import { query } from "@/lib/db"
 
 /**
- * Fetch user-uploaded articles directly from database
+ * Fetch all articles from our API
  */
-async function getUserUploadedArticles(): Promise<Article[]> {
+async function getAllArticles(): Promise<Article[]> {
   try {
-    const sql = `
-      SELECT
-        id, title, link, summary, source, classification, explanation, reasoning,
-        date_published, classification_date, status
-      FROM articles
-      WHERE source IN ('imported', 'uploaded')
-      ORDER BY date_added DESC
-      LIMIT 1000;
-    `
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
-    const result = await query(sql)
+    const res = await fetch(`${baseUrl}/api/articles?limit=10000`, {
+      next: { revalidate: 60 }
+    })
 
-    return result.rows.map((row) => ({
-      ...row,
-      date_published: row.date_published?.toISOString() || null,
-      classification_date: row.classification_date?.toISOString() || null,
-    }))
+    if (!res.ok) {
+      throw new Error('Failed to fetch articles')
+    }
+
+    const data = await res.json()
+    return data.articles
   } catch (error) {
-    console.error('Error fetching user-uploaded articles:', error)
+    console.error('Error fetching articles:', error)
     return []
   }
 }
 
-export default async function UserUploadedPage() {
-  const articles = await getUserUploadedArticles()
+export default async function ArticlesPage() {
+  const articles = await getAllArticles()
 
   return (
     <SidebarProvider
@@ -75,15 +70,15 @@ export default async function UserUploadedPage() {
                     </Button>
                     <div>
                       <h1 className="text-3xl font-bold flex items-center gap-2">
-                        <IconUser className="size-8 text-purple-600" />
-                        Your Uploaded Articles
+                        <IconNews className="size-8 text-blue-600" />
+                        All Articles
                       </h1>
                       <p className="text-muted-foreground mt-1">
-                        Articles you have added to the system
+                        Complete list of all articles in the database
                       </p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-purple-600 dark:text-purple-400 text-lg px-4 py-2">
+                  <Badge variant="outline" className="text-blue-600 dark:text-blue-400 text-lg px-4 py-2">
                     {articles.length} {articles.length === 1 ? 'Article' : 'Articles'}
                   </Badge>
                 </div>
@@ -91,7 +86,7 @@ export default async function UserUploadedPage() {
 
               {/* Filtered Table */}
               <div className="px-4 lg:px-6">
-                <FilteredArticlesTable articles={articles} classification="User Uploaded" />
+                <FilteredArticlesTable articles={articles} classification="All" />
               </div>
             </div>
           </div>

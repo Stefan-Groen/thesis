@@ -24,6 +24,7 @@ export interface Stats {
   opportunities: number
   neutral: number
   unclassified: number
+  articlesToday: number
 }
 
 // Article from database

@@ -38,7 +38,8 @@ export async function GET() {
         COUNT(*) FILTER (WHERE classification = 'Threat') as threats,
         COUNT(*) FILTER (WHERE classification = 'Opportunity') as opportunities,
         COUNT(*) FILTER (WHERE classification = 'Neutral') as neutral,
-        COUNT(*) FILTER (WHERE classification IN ('Error: Unknown', '')) as unclassified
+        COUNT(*) FILTER (WHERE classification IN ('Error: Unknown', '')) as unclassified,
+        COUNT(*) FILTER (WHERE DATE(date_published) = CURRENT_DATE) as articles_today
       FROM articles;
     `
 
@@ -56,6 +57,7 @@ export async function GET() {
       opportunities: Number(stats.opportunities),
       neutral: Number(stats.neutral),
       unclassified: Number(stats.unclassified),
+      articlesToday: Number(stats.articles_today),
     }
 
     // Return JSON response (like jsonify() in Flask)

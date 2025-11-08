@@ -3,6 +3,7 @@
  *
  * Displays a table of articles filtered by classification.
  * Clicking a row opens a modal with full article details.
+ * Supports pagination and sorting.
  *
  * Columns: Classification, Title, Date Published, Source, Link (clickable)
  * Modal shows: Classification, Explanation, Reasoning
@@ -12,7 +13,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { IconExternalLink, IconX } from "@tabler/icons-react"
+import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconChevronsUpDown } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
 
 import { Badge } from "@/components/ui/badge"
@@ -32,20 +33,86 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 interface FilteredArticlesTableProps {
   articles: Article[]
-  classification: 'Threat' | 'Opportunity' | 'Neutral'
+  classification?: 'Threat' | 'Opportunity' | 'Neutral' | 'All' | 'Backlog' | 'User Uploaded'
 }
 
-export function FilteredArticlesTable({ articles, classification }: FilteredArticlesTableProps) {
+type SortField = 'classification' | 'title' | 'date_published' | 'source'
+type SortDirection = 'asc' | 'desc' | null
+
+export function FilteredArticlesTable({ articles, classification = 'All' }: FilteredArticlesTableProps) {
   const [selectedArticle, setSelectedArticle] = React.useState<Article | null>(null)
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [pageSize, setPageSize] = React.useState(30)
+  const [sortField, setSortField] = React.useState<SortField | null>(null)
+  const [sortDirection, setSortDirection] = React.useState<SortDirection>(null)
+
+  // Sorting logic
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Cycle through: asc -> desc -> null
+      if (sortDirection === 'asc') {
+        setSortDirection('desc')
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null)
+        setSortField(null)
+      }
+    } else {
+      setSortField(field)
+      setSortDirection('asc')
+    }
+    setCurrentPage(1) // Reset to first page when sorting changes
+  }
+
+  // Sort articles
+  const sortedArticles = React.useMemo(() => {
+    if (!sortField || !sortDirection) return articles
+
+    return [...articles].sort((a, b) => {
+      let aValue: any = a[sortField]
+      let bValue: any = b[sortField]
+
+      // Handle null/undefined values
+      if (aValue === null || aValue === undefined) return 1
+      if (bValue === null || bValue === undefined) return -1
+
+      // Convert to lowercase for string comparison
+      if (typeof aValue === 'string') aValue = aValue.toLowerCase()
+      if (typeof bValue === 'string') bValue = bValue.toLowerCase()
+
+      // Compare
+      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1
+      return 0
+    })
+  }, [articles, sortField, sortDirection])
+
+  // Pagination logic
+  const totalPages = pageSize === -1 ? 1 : Math.ceil(sortedArticles.length / pageSize)
+  const startIndex = pageSize === -1 ? 0 : (currentPage - 1) * pageSize
+  const endIndex = pageSize === -1 ? sortedArticles.length : startIndex + pageSize
+  const paginatedArticles = sortedArticles.slice(startIndex, endIndex)
+
+  // Reset to first page when page size changes
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(value === 'all' ? -1 : parseInt(value))
+    setCurrentPage(1)
+  }
 
   // If no articles, show a message
   if (articles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
-        <p className="text-muted-foreground text-lg">No {classification.toLowerCase()} articles found</p>
+        <p className="text-muted-foreground text-lg">No {classification?.toLowerCase()} articles found</p>
         <p className="text-muted-foreground text-sm mt-2">
           Run your Python script to fetch and classify more articles
         </p>
@@ -53,21 +120,89 @@ export function FilteredArticlesTable({ articles, classification }: FilteredArti
     )
   }
 
+  // Helper to render sort icon
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) {
+      return <IconChevronsUpDown className="size-4 ml-1 text-muted-foreground" />
+    }
+    if (sortDirection === 'asc') {
+      return <IconChevronUp className="size-4 ml-1" />
+    }
+    return <IconChevronDown className="size-4 ml-1" />
+  }
+
   return (
     <>
-      <div className="overflow-hidden rounded-lg border">
-        <Table>
-          <TableHeader className="bg-muted sticky top-0 z-10">
-            <TableRow>
-              <TableHead className="w-32">Classification</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead className="w-40">Date Published</TableHead>
-              <TableHead className="w-32">Source</TableHead>
-              <TableHead className="w-16">Link</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {articles.map((article) => (
+      <div className="space-y-4">
+        {/* Pagination controls - Top */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              Showing {startIndex + 1}-{Math.min(endIndex, sortedArticles.length)} of {sortedArticles.length}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Rows per page:</span>
+            <Select value={pageSize === -1 ? 'all' : pageSize.toString()} onValueChange={handlePageSizeChange}>
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="30">30</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-hidden rounded-lg border">
+          <Table>
+            <TableHeader className="bg-muted sticky top-0 z-10">
+              <TableRow>
+                <TableHead className="w-32">
+                  <button
+                    onClick={() => handleSort('classification')}
+                    className="flex items-center hover:text-foreground"
+                  >
+                    Classification
+                    <SortIcon field="classification" />
+                  </button>
+                </TableHead>
+                <TableHead>
+                  <button
+                    onClick={() => handleSort('title')}
+                    className="flex items-center hover:text-foreground"
+                  >
+                    Title
+                    <SortIcon field="title" />
+                  </button>
+                </TableHead>
+                <TableHead className="w-40">
+                  <button
+                    onClick={() => handleSort('date_published')}
+                    className="flex items-center hover:text-foreground"
+                  >
+                    Date Published
+                    <SortIcon field="date_published" />
+                  </button>
+                </TableHead>
+                <TableHead className="w-32">
+                  <button
+                    onClick={() => handleSort('source')}
+                    className="flex items-center hover:text-foreground"
+                  >
+                    Source
+                    <SortIcon field="source" />
+                  </button>
+                </TableHead>
+                <TableHead className="w-16">Link</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {paginatedArticles.map((article) => (
               <TableRow
                 key={article.id}
                 className="cursor-pointer hover:bg-muted/50"
@@ -126,6 +261,48 @@ export function FilteredArticlesTable({ articles, classification }: FilteredArti
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination controls - Bottom */}
+      {pageSize !== -1 && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+          >
+            First
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(totalPages)}
+            disabled={currentPage === totalPages}
+          >
+            Last
+          </Button>
+        </div>
+      )}
+    </div>
 
       {/* Article Detail Modal */}
       <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>

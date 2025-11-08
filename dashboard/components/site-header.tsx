@@ -1,4 +1,4 @@
-import { IconBrandGithub, IconFileText } from "@tabler/icons-react"
+import { IconBrandGithub, IconBrandLinkedin, IconFileText } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
@@ -32,8 +32,19 @@ export function SiteHeader() {
               target="_blank"
               className="dark:text-foreground"
             >
-              <IconBrandGithub className="size-4 mr-2" />
+              <IconBrandGithub className="size-4 mr-2 text-gray-800 dark:text-gray-300" />
               GitHub
+            </a>
+          </Button>
+          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
+            <a
+              href="https://www.linkedin.com/in/stefan-groen-557223265/"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="dark:text-foreground"
+            >
+              <IconBrandLinkedin className="size-4 mr-2" style={{ color: '#0077B5' }} />
+              LinkedIn
             </a>
           </Button>
         </div>

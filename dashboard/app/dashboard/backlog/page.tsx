@@ -91,76 +91,9 @@ export default async function BacklogPage() {
                 </div>
               </div>
 
-              {/* Table */}
+              {/* Filtered Table */}
               <div className="px-4 lg:px-6">
-                {articles.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
-                    <p className="text-muted-foreground text-lg">No articles in backlog</p>
-                    <p className="text-muted-foreground text-sm mt-2">
-                      All articles have been classified!
-                    </p>
-                  </div>
-                ) : (
-                  <div className="overflow-hidden rounded-lg border">
-                    <table className="w-full">
-                      <thead className="bg-muted">
-                        <tr>
-                          <th className="text-left p-4 font-medium">Title</th>
-                          <th className="text-left p-4 font-medium w-40">Date Published</th>
-                          <th className="text-left p-4 font-medium w-32">Source</th>
-                          <th className="text-left p-4 font-medium w-16">Link</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {articles.map((article) => (
-                          <tr key={article.id} className="border-t hover:bg-muted/50">
-                            <td className="p-4">
-                              <div className="font-medium line-clamp-2">{article.title}</div>
-                              {article.summary && (
-                                <div className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                                  {article.summary}
-                                </div>
-                              )}
-                            </td>
-                            <td className="p-4">
-                              <span className="text-muted-foreground text-sm">
-                                {article.date_published
-                                  ? new Date(article.date_published).toLocaleDateString('en-US', {
-                                      month: 'short',
-                                      day: 'numeric',
-                                      year: 'numeric',
-                                    })
-                                  : 'Unknown'}
-                              </span>
-                            </td>
-                            <td className="p-4">
-                              <span className="text-muted-foreground text-sm">
-                                {article.source || 'Unknown'}
-                              </span>
-                            </td>
-                            <td className="p-4">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="size-8"
-                                asChild
-                              >
-                                <Link
-                                  href={article.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  title="Open article"
-                                >
-                                  <IconArrowLeft className="size-4 rotate-180" />
-                                </Link>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                <FilteredArticlesTable articles={articles} classification="Backlog" />
               </div>
             </div>
           </div>
