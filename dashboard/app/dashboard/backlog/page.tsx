@@ -28,7 +28,8 @@ async function getBacklogArticles(): Promise<Article[]> {
         id, title, link, summary, source, classification, explanation,
         date_published, classification_date, status
       FROM articles
-      WHERE classification = '' OR classification IS NULL OR status = 'PENDING'
+      WHERE (classification = '' OR classification IS NULL OR status = 'PENDING')
+      AND classification != 'OUTDATED' AND status != 'OUTDATED'
       ORDER BY date_added DESC
       LIMIT 1000;
     `

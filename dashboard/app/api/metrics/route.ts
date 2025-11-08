@@ -12,14 +12,15 @@ import { query } from '@/lib/db'
 
 export async function GET() {
   try {
-    // Backlog: Articles with empty classification or status PENDING
+    // Backlog: Articles with empty classification or status PENDING (excluding OUTDATED)
     const backlogSql = `
       SELECT COUNT(*) as count
       FROM articles
-      WHERE classification = '' OR classification IS NULL OR status = 'PENDING';
+      WHERE (classification = '' OR classification IS NULL OR status = 'PENDING')
+      AND classification != 'OUTDATED' AND status != 'OUTDATED';
     `
 
-    // Service Level: Percentage classified within 6 hours (excluding SENT status)
+    // Service Level: Percentage classified within 6 hours (excluding OUTDATED status)
     const serviceLevelSql = `
       SELECT
         COUNT(*) FILTER (
@@ -32,14 +33,15 @@ export async function GET() {
           AND date_published IS NOT NULL
         ) as total_classified
       FROM articles
-      WHERE status != 'SENT';
+      WHERE status != 'OUTDATED' AND classification != 'OUTDATED';
     `
 
-    // Own Articles: Articles with source 'imported'
+    // Own Articles: Articles with source 'imported' or 'uploaded' (excluding OUTDATED)
     const ownArticlesSql = `
       SELECT COUNT(*) as count
       FROM articles
-      WHERE source = 'imported' OR source = 'uploaded';
+      WHERE (source = 'imported' OR source = 'uploaded')
+      AND classification != 'OUTDATED' AND status != 'OUTDATED';
     `
 
     const [backlogResult, serviceLevelResult, ownArticlesResult] = await Promise.all([

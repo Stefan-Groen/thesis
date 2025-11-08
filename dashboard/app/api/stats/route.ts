@@ -31,7 +31,7 @@ import { query } from '@/lib/db'
 export async function GET() {
   try {
     // SQL query to get counts by classification
-    // This uses a CASE statement to count each classification type
+    // Excludes OUTDATED articles (previously SENT articles that are no longer relevant)
     const sql = `
       SELECT
         COUNT(*) as total,
@@ -40,7 +40,8 @@ export async function GET() {
         COUNT(*) FILTER (WHERE classification = 'Neutral') as neutral,
         COUNT(*) FILTER (WHERE classification IN ('Error: Unknown', '')) as unclassified,
         COUNT(*) FILTER (WHERE DATE(date_published) = CURRENT_DATE) as articles_today
-      FROM articles;
+      FROM articles
+      WHERE classification != 'OUTDATED' AND status != 'OUTDATED';
     `
 
     // Execute the query (like cursor.execute() in Python)

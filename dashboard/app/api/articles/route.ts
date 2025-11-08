@@ -57,9 +57,12 @@ export async function GET(request: NextRequest) {
     const params: any[] = []
     let paramIndex = 1
 
+    // Always exclude OUTDATED articles
+    sql += ` WHERE classification != 'OUTDATED' AND status != 'OUTDATED'`
+
     // Add classification filter if provided
     if (classificationFilter) {
-      sql += ` WHERE classification = $${paramIndex}`
+      sql += ` AND classification = $${paramIndex}`
       params.push(classificationFilter)
       paramIndex++
     }
@@ -75,11 +78,11 @@ export async function GET(request: NextRequest) {
     const result = await query(sql, params)
 
     // Also get the total count for pagination
-    let countSql = `SELECT COUNT(*) as total FROM articles`
+    let countSql = `SELECT COUNT(*) as total FROM articles WHERE classification != 'OUTDATED' AND status != 'OUTDATED'`
     const countParams: any[] = []
 
     if (classificationFilter) {
-      countSql += ` WHERE classification = $1`
+      countSql += ` AND classification = $1`
       countParams.push(classificationFilter)
     }
 

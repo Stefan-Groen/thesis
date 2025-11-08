@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '7', 10)
 
-    // Get published articles count per day
+    // Get published articles count per day (excluding OUTDATED)
     const publishedSql = `
       SELECT
         date_trunc('day', date_published)::date as date,
@@ -31,11 +31,13 @@ export async function GET(request: NextRequest) {
       WHERE
         date_published >= NOW() - INTERVAL '${days} days'
         AND date_published IS NOT NULL
+        AND classification != 'OUTDATED'
+        AND status != 'OUTDATED'
       GROUP BY date_trunc('day', date_published)
       ORDER BY date ASC;
     `
 
-    // Get classified articles count per day
+    // Get classified articles count per day (excluding OUTDATED)
     const classifiedSql = `
       SELECT
         date_trunc('day', classification_date)::date as date,
@@ -44,6 +46,8 @@ export async function GET(request: NextRequest) {
       WHERE
         classification_date >= NOW() - INTERVAL '${days} days'
         AND classification_date IS NOT NULL
+        AND classification != 'OUTDATED'
+        AND status != 'OUTDATED'
       GROUP BY date_trunc('day', classification_date)
       ORDER BY date ASC;
     `

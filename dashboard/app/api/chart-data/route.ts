@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const truncFunc = `date_trunc('${interval}', date_published)`
 
     // SQL query to get counts grouped by publication date
-    // Only includes Threats and Opportunities (excludes Neutral)
+    // Only includes Threats and Opportunities (excludes Neutral and OUTDATED)
     const sql = `
       SELECT
         ${truncFunc}::date as date,
@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
         date_published >= NOW() - INTERVAL '${days} days'
         AND date_published IS NOT NULL
         AND classification IN ('Threat', 'Opportunity')
+        AND status != 'OUTDATED'
       GROUP BY ${truncFunc}
       ORDER BY date ASC;
     `
