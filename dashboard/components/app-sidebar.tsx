@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import {
   IconHome,
   IconNews,
@@ -89,14 +90,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <div className="px-2 py-2">
+        <Link href="/dashboard" className="px-2 py-2 flex items-center gap-2 hover:bg-muted/50 rounded-md transition-colors">
+          <IconHome className="size-5" />
           <h2 className="text-lg font-semibold">Dashboard</h2>
-        </div>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
         <NavMain
           items={data.navMain}
-          label="Home"
+          label="Pages"
           labelIcon={IconHome}
           labelUrl="/dashboard"
         />
