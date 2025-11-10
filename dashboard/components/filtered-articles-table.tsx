@@ -113,11 +113,8 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
           toast.success('Article unstarred')
         }
 
-        // Refresh the page data after successful star toggle
-        // Add a small delay to ensure the database update is complete
-        setTimeout(() => {
-          router.refresh()
-        }, 100)
+        // Refresh the page data - revalidatePath on server clears cache
+        router.refresh()
       }
     } catch (error) {
       // Revert on error

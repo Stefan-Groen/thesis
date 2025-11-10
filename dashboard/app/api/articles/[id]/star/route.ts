@@ -24,6 +24,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { query } from '@/lib/db'
 
 export async function PATCH(
@@ -59,6 +60,15 @@ export async function PATCH(
         { status: 404 }
       )
     }
+
+    // Invalidate cache for all pages that show article data
+    // This forces them to refetch fresh data on next request
+    revalidatePath('/dashboard')
+    revalidatePath('/dashboard/starred')
+    revalidatePath('/dashboard/articles')
+    revalidatePath('/dashboard/threats')
+    revalidatePath('/dashboard/opportunities')
+    revalidatePath('/dashboard/neutral')
 
     // Return the new starred status
     return NextResponse.json({
