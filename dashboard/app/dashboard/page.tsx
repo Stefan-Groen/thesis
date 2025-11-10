@@ -140,82 +140,78 @@ export default async function Page() {
               {/* Summary Cards - Row 1 & 2 */}
               <SectionCards stats={stats} />
 
-              {/* Row 3: Classification Chart (4 cols) + Backlog & Service Level (4 cols) */}
+              {/* Row 3: Both graphs side by side (4 cols each) */}
               <div className="px-4 lg:px-6">
                 <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-                  {/* Classification Trends Chart - Left side */}
+                  {/* Classification Trends Chart - Left */}
                   <div>
                     <ChartAreaInteractive data={chartData} />
                   </div>
 
-                  {/* Backlog & Service Level - Right side */}
-                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                    {/* Backlog Card */}
-                    <Link href="/dashboard/backlog" className="block">
-                      <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <IconClock className="size-8 text-orange-600" />
-                            <Badge variant="outline" className="text-lg px-3 py-1">
-                              {metrics.backlog}
-                            </Badge>
-                          </div>
-                          <CardTitle className="text-xl mt-2">Backlog</CardTitle>
-                          <CardDescription>
-                            Articles still needed to be classified
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    </Link>
-
-                    {/* Service Level Card */}
-                    <Card className="h-full">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <IconGauge className="size-8 text-blue-600" />
-                          <Badge variant="outline" className="text-lg px-3 py-1">
-                            {metrics.serviceLevel.toFixed(1)}%
-                          </Badge>
-                        </div>
-                        <CardTitle className="text-xl mt-2">Service Level</CardTitle>
-                        <CardDescription>
-                          Articles classified within 6 hours
-                        </CardDescription>
-                      </CardHeader>
-                    </Card>
+                  {/* Activity Line Chart - Right */}
+                  <div>
+                    <ActivityLineChart data={activityData} />
                   </div>
                 </div>
               </div>
 
-              {/* Row 4: Activity Line Chart (4 cols) + Own Articles & Upload (4 cols) */}
+              {/* Row 4: Metric cards in a row - Backlog, Own Articles, Service Level, Upload (2 cols each) */}
               <div className="px-4 lg:px-6">
-                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
-                  {/* Activity Line Chart - Left side */}
-                  <div>
-                    <ActivityLineChart data={activityData} />
-                  </div>
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+                  {/* Backlog Card */}
+                  <Link href="/dashboard/backlog" className="block">
+                    <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <IconClock className="size-8 text-orange-600" />
+                          <Badge variant="outline" className="text-lg px-3 py-1">
+                            {metrics.backlog}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-xl mt-2">Backlog</CardTitle>
+                        <CardDescription>
+                          Articles still needed to be classified
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </Link>
 
-                  {/* Own Articles & Upload - Right side */}
-                  <div className="grid gap-4 grid-cols-1">
-                    {/* Own Articles Card */}
-                    <Link href="/dashboard/user_uploaded" className="block">
-                      <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <IconUser className="size-8 text-purple-600" />
-                            <Badge variant="outline" className="text-lg px-3 py-1">
-                              {metrics.ownArticles}
-                            </Badge>
-                          </div>
-                          <CardTitle className="text-xl mt-2">Own Articles</CardTitle>
-                          <CardDescription>
-                            Articles added by you
-                          </CardDescription>
-                        </CardHeader>
-                      </Card>
-                    </Link>
+                  {/* Own Articles Card */}
+                  <Link href="/dashboard/user_uploaded" className="block">
+                    <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <IconUser className="size-8 text-purple-600" />
+                          <Badge variant="outline" className="text-lg px-3 py-1">
+                            {metrics.ownArticles}
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-xl mt-2">Own Articles</CardTitle>
+                        <CardDescription>
+                          Articles added by you
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </Link>
 
-                    {/* Upload Article Dialog */}
+                  {/* Service Level Card */}
+                  <Card className="h-full">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <IconGauge className="size-8 text-blue-600" />
+                        <Badge variant="outline" className="text-lg px-3 py-1">
+                          {metrics.serviceLevel.toFixed(1)}%
+                        </Badge>
+                      </div>
+                      <CardTitle className="text-xl mt-2">Service Level</CardTitle>
+                      <CardDescription>
+                        Articles classified within 6 hours
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+
+                  {/* Upload Article Dialog */}
+                  <div className="h-full">
                     <UploadArticleDialog />
                   </div>
                 </div>
