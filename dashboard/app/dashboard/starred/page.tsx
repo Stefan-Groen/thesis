@@ -86,7 +86,7 @@ export default async function StarredPage() {
 
               {/* Filtered Table */}
               <div className="px-4 lg:px-6">
-                <FilteredArticlesTable articles={articles} classification="All" />
+                <FilteredArticlesTable articles={articles} classification="Starred" />
               </div>
             </div>
           </div>

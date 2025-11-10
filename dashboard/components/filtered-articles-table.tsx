@@ -44,7 +44,7 @@ import {
 
 interface FilteredArticlesTableProps {
   articles: Article[]
-  classification?: 'Threat' | 'Opportunity' | 'Neutral' | 'All' | 'Backlog' | 'User Uploaded'
+  classification?: 'Threat' | 'Opportunity' | 'Neutral' | 'All' | 'Backlog' | 'User Uploaded' | 'Starred'
 }
 
 type SortField = 'classification' | 'title' | 'date_published' | 'source'
@@ -234,11 +234,20 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
     })
   }, [articles, sortField, sortDirection])
 
+  // Filter articles based on starred status when on starred page
+  const filteredArticles = React.useMemo(() => {
+    // On starred page, filter out articles that have been unstarred
+    if (classification === 'Starred') {
+      return sortedArticles.filter(article => starredArticles[article.id] === true)
+    }
+    return sortedArticles
+  }, [sortedArticles, starredArticles, classification])
+
   // Pagination logic
-  const totalPages = pageSize === -1 ? 1 : Math.ceil(sortedArticles.length / pageSize)
+  const totalPages = pageSize === -1 ? 1 : Math.ceil(filteredArticles.length / pageSize)
   const startIndex = pageSize === -1 ? 0 : (currentPage - 1) * pageSize
-  const endIndex = pageSize === -1 ? sortedArticles.length : startIndex + pageSize
-  const paginatedArticles = sortedArticles.slice(startIndex, endIndex)
+  const endIndex = pageSize === -1 ? filteredArticles.length : startIndex + pageSize
+  const paginatedArticles = filteredArticles.slice(startIndex, endIndex)
 
   // Reset to first page when page size changes
   const handlePageSizeChange = (value: string) => {
@@ -247,12 +256,14 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   }
 
   // If no articles, show a message
-  if (articles.length === 0) {
+  if (filteredArticles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
         <p className="text-muted-foreground text-lg">No {classification?.toLowerCase()} articles found</p>
         <p className="text-muted-foreground text-sm mt-2">
-          Run your Python script to fetch and classify more articles
+          {classification === 'Starred'
+            ? 'Star some articles to see them here'
+            : 'Run your Python script to fetch and classify more articles'}
         </p>
       </div>
     )
@@ -276,7 +287,7 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              Showing {startIndex + 1}-{Math.min(endIndex, sortedArticles.length)} of {sortedArticles.length}
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredArticles.length)} of {filteredArticles.length}
             </span>
           </div>
           <div className="flex items-center gap-2">
