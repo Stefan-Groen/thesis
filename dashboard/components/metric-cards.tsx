@@ -49,22 +49,6 @@ export function MetricCards({ metrics }: MetricCardsProps) {
         </Card>
       </Link>
 
-      {/* Service Level Card - Not Clickable */}
-      <Card className="h-full">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <IconGauge className="size-8 text-blue-600" />
-            <Badge variant="outline" className="text-lg px-3 py-1">
-              {metrics.serviceLevel.toFixed(1)}%
-            </Badge>
-          </div>
-          <CardTitle className="text-xl mt-2">Service Level</CardTitle>
-          <CardDescription>
-            Articles classified within 6 hours
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
       {/* Own Articles Card - Clickable */}
       <Link href="/dashboard/user_uploaded" className="block">
         <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
@@ -82,6 +66,22 @@ export function MetricCards({ metrics }: MetricCardsProps) {
           </CardHeader>
         </Card>
       </Link>
+
+      {/* Service Level Card - Not Clickable */}
+      <Card className="h-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <IconGauge className="size-8 text-blue-600" />
+            <Badge variant="outline" className="text-lg px-3 py-1">
+              {metrics.serviceLevel.toFixed(1)}%
+            </Badge>
+          </div>
+          <CardTitle className="text-xl mt-2">Service Level</CardTitle>
+          <CardDescription>
+            Articles classified within 6 hours
+          </CardDescription>
+        </CardHeader>
+      </Card>
     </div>
   )
 }

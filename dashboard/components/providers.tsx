@@ -18,12 +18,17 @@
  * - Login status
  * - Session data
  *
- * Without this, useSession() wouldn't work!
+ * The ThemeProvider from next-themes enables:
+ * - Dark mode / Light mode switching
+ * - Persisted theme preference
+ *
+ * Without this, useSession() and useTheme() wouldn't work!
  */
 
 "use client"
 
 import { SessionProvider } from "next-auth/react"
+import { ThemeProvider } from "next-themes"
 import { Toaster } from "sonner"
 import { ReactNode } from "react"
 
@@ -34,8 +39,10 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
-      <Toaster position="bottom-right" duration={5000} />
-      {children}
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <Toaster position="bottom-right" duration={5000} />
+        {children}
+      </ThemeProvider>
     </SessionProvider>
   )
 }
