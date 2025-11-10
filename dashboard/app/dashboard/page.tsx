@@ -30,7 +30,7 @@ async function getStats(): Promise<Stats> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/stats`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
 
     if (!res.ok) {
@@ -40,7 +40,7 @@ async function getStats(): Promise<Stats> {
     return res.json()
   } catch (error) {
     console.error('Error fetching stats:', error)
-    return { total: 0, threats: 0, opportunities: 0, neutral: 0, unclassified: 0 }
+    return { total: 0, threats: 0, opportunities: 0, neutral: 0, unclassified: 0, articlesToday: 0, starred: 0 }
   }
 }
 
@@ -52,7 +52,7 @@ async function getChartData(): Promise<ChartDataPoint[]> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/chart-data?days=90`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
 
     if (!res.ok) {
@@ -74,7 +74,7 @@ async function getActivityData(): Promise<ActivityDataPoint[]> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/activity-data?days=90`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
 
     if (!res.ok) {
@@ -96,7 +96,7 @@ async function getMetrics(): Promise<Metrics> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/metrics`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
 
     if (!res.ok) {

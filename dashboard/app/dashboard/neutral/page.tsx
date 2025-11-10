@@ -26,7 +26,7 @@ async function getNeutralArticles(): Promise<Article[]> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/articles?classification=Neutral&limit=1000`, {
-      next: { revalidate: 60 }
+      cache: 'no-store'
     })
 
     if (!res.ok) {
