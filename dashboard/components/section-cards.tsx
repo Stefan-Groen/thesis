@@ -17,7 +17,7 @@
  */
 
 import Link from "next/link"
-import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled, IconClockPlus } from "@tabler/icons-react"
+import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled } from "@tabler/icons-react"
 import type { Stats } from "@/lib/types"
 
 import { Badge } from "@/components/ui/badge"
@@ -210,32 +210,6 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </CardFooter>
         </Card>
       </Link>
-
-      {/* New Since Last Visit Card - Not clickable (2 cols) */}
-      <div className="@container/card @5xl/main:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardDescription>New Since Last Visit</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {(stats.newSinceLastVisit ?? 0).toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline" className="text-purple-600 dark:text-purple-400">
-                <IconClockPlus className="size-4" />
-                Recent
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Articles added since your last visit
-            </div>
-            <div className="text-muted-foreground">
-              New content for you to review
-            </div>
-          </CardFooter>
-        </Card>
-      </div>
     </div>
     </>
   )

@@ -14,7 +14,6 @@ import { MetricCards } from "@/components/metric-cards"
 import { UploadArticleDialog } from "@/components/upload-article-dialog"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
-import { DashboardVisitTracker } from "@/components/dashboard-visit-tracker"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -41,7 +40,7 @@ async function getStats(): Promise<Stats> {
     return res.json()
   } catch (error) {
     console.error('Error fetching stats:', error)
-    return { total: 0, threats: 0, opportunities: 0, neutral: 0, unclassified: 0, articlesToday: 0, starred: 0, newSinceLastVisit: 0 }
+    return { total: 0, threats: 0, opportunities: 0, neutral: 0, unclassified: 0, articlesToday: 0, starred: 0 }
   }
 }
 
@@ -135,7 +134,6 @@ export default async function Page() {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <DashboardVisitTracker />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

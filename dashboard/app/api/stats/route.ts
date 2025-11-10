@@ -6,7 +6,6 @@
  * - Number of articles classified as "Threat"
  * - Number of articles classified as "Opportunity"
  * - Number of articles classified as "Neutral"
- * - New articles since last dashboard visit
  *
  * Python Flask equivalent:
  * ```python
@@ -20,7 +19,6 @@
 
 import { NextResponse } from 'next/server'
 import { query } from '@/lib/db'
-import { auth } from '@/auth'
 
 /**
  * GET /api/stats
@@ -32,23 +30,6 @@ import { auth } from '@/auth'
  */
 export async function GET() {
   try {
-    // Get the authenticated user session
-    const session = await auth()
-
-    // Get user's last dashboard visit time (default to epoch if not set)
-    let lastVisit = new Date(0) // Default to epoch (1970-01-01)
-
-    if (session?.user?.id) {
-      const userResult = await query(
-        'SELECT last_dashboard_visit FROM users WHERE id = $1',
-        [session.user.id]
-      )
-
-      if (userResult.rows[0]?.last_dashboard_visit) {
-        lastVisit = new Date(userResult.rows[0].last_dashboard_visit)
-      }
-    }
-
     // SQL query to get counts by classification
     // Excludes OUTDATED articles (previously SENT articles that are no longer relevant)
     const sql = `
@@ -59,14 +40,13 @@ export async function GET() {
         COUNT(*) FILTER (WHERE classification = 'Neutral') as neutral,
         COUNT(*) FILTER (WHERE classification IN ('Error: Unknown', '')) as unclassified,
         COUNT(*) FILTER (WHERE DATE(date_published) = CURRENT_DATE) as articles_today,
-        COUNT(*) FILTER (WHERE starred = true) as starred,
-        COUNT(*) FILTER (WHERE date_published > $1) as new_since_last_visit
+        COUNT(*) FILTER (WHERE starred = true) as starred
       FROM articles
       WHERE classification != 'OUTDATED' AND status != 'OUTDATED';
     `
 
     // Execute the query (like cursor.execute() in Python)
-    const result = await query(sql, [lastVisit.toISOString()])
+    const result = await query(sql)
 
     // Get the first row (there's only one row with the counts)
     const stats = result.rows[0]
@@ -81,7 +61,6 @@ export async function GET() {
       unclassified: Number(stats.unclassified),
       articlesToday: Number(stats.articles_today),
       starred: Number(stats.starred),
-      newSinceLastVisit: Number(stats.new_since_last_visit),
     }
 
     // Return JSON response (like jsonify() in Flask)
