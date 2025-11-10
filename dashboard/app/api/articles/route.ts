@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
         source,
         classification,
         explanation,
+        reasoning,
         date_published,
         classification_date,
         status
