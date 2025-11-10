@@ -5,6 +5,8 @@
  * and passes it to the client components.
  */
 
+import Link from "next/link"
+import { IconClock, IconGauge, IconUser } from "@tabler/icons-react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { ActivityLineChart } from "@/components/activity-line-chart"
@@ -12,6 +14,8 @@ import { MetricCards } from "@/components/metric-cards"
 import { UploadArticleDialog } from "@/components/upload-article-dialog"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   SidebarInset,
   SidebarProvider,
@@ -133,25 +137,85 @@ export default async function Page() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              {/* Summary Cards */}
+              {/* Summary Cards - Row 1 & 2 */}
               <SectionCards stats={stats} />
 
-              {/* Classification Trends Bar Chart */}
+              {/* Row 3: Classification Chart (4 cols) + Backlog & Service Level (4 cols) */}
               <div className="px-4 lg:px-6">
-                <ChartAreaInteractive data={chartData} />
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                  {/* Classification Trends Chart - Left side */}
+                  <div>
+                    <ChartAreaInteractive data={chartData} />
+                  </div>
+
+                  {/* Backlog & Service Level - Right side */}
+                  <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                    {/* Backlog Card */}
+                    <Link href="/dashboard/backlog" className="block">
+                      <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <IconClock className="size-8 text-orange-600" />
+                            <Badge variant="outline" className="text-lg px-3 py-1">
+                              {metrics.backlog}
+                            </Badge>
+                          </div>
+                          <CardTitle className="text-xl mt-2">Backlog</CardTitle>
+                          <CardDescription>
+                            Articles still needed to be classified
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+
+                    {/* Service Level Card */}
+                    <Card className="h-full">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <IconGauge className="size-8 text-blue-600" />
+                          <Badge variant="outline" className="text-lg px-3 py-1">
+                            {metrics.serviceLevel.toFixed(1)}%
+                          </Badge>
+                        </div>
+                        <CardTitle className="text-xl mt-2">Service Level</CardTitle>
+                        <CardDescription>
+                          Articles classified within 6 hours
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  </div>
+                </div>
               </div>
 
-              {/* Activity Line Chart and Metrics - Side by Side */}
+              {/* Row 4: Activity Line Chart (4 cols) + Own Articles & Upload (4 cols) */}
               <div className="px-4 lg:px-6">
-                <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
-                  {/* Activity Line Chart - Takes 2 columns */}
-                  <div className="lg:col-span-2">
+                <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+                  {/* Activity Line Chart - Left side */}
+                  <div>
                     <ActivityLineChart data={activityData} />
                   </div>
 
-                  {/* Metrics and Upload - Stacked */}
-                  <div className="flex flex-col gap-4">
-                    <MetricCards metrics={metrics} />
+                  {/* Own Articles & Upload - Right side */}
+                  <div className="grid gap-4 grid-cols-1">
+                    {/* Own Articles Card */}
+                    <Link href="/dashboard/user_uploaded" className="block">
+                      <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+                        <CardHeader>
+                          <div className="flex items-center justify-between">
+                            <IconUser className="size-8 text-purple-600" />
+                            <Badge variant="outline" className="text-lg px-3 py-1">
+                              {metrics.ownArticles}
+                            </Badge>
+                          </div>
+                          <CardTitle className="text-xl mt-2">Own Articles</CardTitle>
+                          <CardDescription>
+                            Articles added by you
+                          </CardDescription>
+                        </CardHeader>
+                      </Card>
+                    </Link>
+
+                    {/* Upload Article Dialog */}
                     <UploadArticleDialog />
                   </div>
                 </div>

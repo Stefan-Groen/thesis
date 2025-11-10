@@ -50,9 +50,11 @@ export function SectionCards({ stats }: SectionCardsProps) {
     : '0.0'
 
   return (
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
-      {/* Total Articles Card - Clickable (Half size) */}
-      <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-1">
+    <>
+      {/* First Row: Main Statistics - Total, Threats, Opportunities, Neutral (2+2+2+2=8) */}
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
+        {/* Total Articles Card - Clickable (2 cols) */}
+        <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-2">
         <Card className="cursor-pointer transition-all hover:bg-muted/50">
           <CardHeader>
             <CardDescription>Total Articles</CardDescription>
@@ -72,32 +74,6 @@ export function SectionCards({ stats }: SectionCardsProps) {
             </div>
             <div className="text-muted-foreground">
               Click to view all articles
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
-
-      {/* Articles Added Today Card (Half size) - Clickable */}
-      <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-1">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Added Today</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.articlesToday.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconCalendarEvent className="size-4" />
-                Today
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Articles published today
-            </div>
-            <div className="text-muted-foreground">
-              Click to view today's articles
             </div>
           </CardFooter>
         </Card>
@@ -181,5 +157,34 @@ export function SectionCards({ stats }: SectionCardsProps) {
         </Card>
       </Link>
     </div>
+
+    {/* Second Row: Articles Added Today (2 cols wide) */}
+    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
+      <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-2">
+        <Card className="cursor-pointer transition-all hover:bg-muted/50">
+          <CardHeader>
+            <CardDescription>Added Today</CardDescription>
+            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+              {stats.articlesToday.toLocaleString()}
+            </CardTitle>
+            <CardAction>
+              <Badge variant="outline">
+                <IconCalendarEvent className="size-4" />
+                Today
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="flex-col items-start gap-1.5 text-sm">
+            <div className="line-clamp-1 flex gap-2 font-medium">
+              Articles published today
+            </div>
+            <div className="text-muted-foreground">
+              Click to view today's articles
+            </div>
+          </CardFooter>
+        </Card>
+      </Link>
+    </div>
+    </>
   )
 }
