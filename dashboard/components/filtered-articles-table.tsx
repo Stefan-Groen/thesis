@@ -13,8 +13,9 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector } from "@tabler/icons-react"
+import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
+import { jsPDF } from "jspdf"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -55,6 +56,76 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   const [pageSize, setPageSize] = React.useState(30)
   const [sortField, setSortField] = React.useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(null)
+
+  // Function to generate and download PDF
+  const downloadPDF = () => {
+    if (!selectedArticle) return
+
+    const doc = new jsPDF()
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const margin = 15
+    const maxWidth = pageWidth - 2 * margin
+    let yPosition = 20
+
+    // Helper function to add text with word wrapping
+    const addText = (text: string, fontSize: number = 11, isBold: boolean = false) => {
+      doc.setFontSize(fontSize)
+      doc.setFont('helvetica', isBold ? 'bold' : 'normal')
+      const lines = doc.splitTextToSize(text, maxWidth)
+      doc.text(lines, margin, yPosition)
+      yPosition += lines.length * (fontSize * 0.5) + 5
+    }
+
+    // Add title
+    addText(selectedArticle.title, 16, true)
+
+    // Add published date
+    const publishedDate = selectedArticle.date_published
+      ? new Date(selectedArticle.date_published).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        })
+      : 'Unknown'
+    addText(`Published: ${publishedDate}`, 10)
+    yPosition += 5
+
+    // Add classification
+    addText('Classification', 12, true)
+    addText(selectedArticle.classification || 'Unknown', 11)
+    yPosition += 5
+
+    // Add LLM Explanation
+    if (selectedArticle.explanation) {
+      addText('LLM Explanation', 12, true)
+      addText(selectedArticle.explanation, 11)
+      yPosition += 5
+    }
+
+    // Add LLM Reasoning
+    if (selectedArticle.reasoning) {
+      // Check if we need a new page
+      if (yPosition > 250) {
+        doc.addPage()
+        yPosition = 20
+      }
+      addText('LLM Reasoning', 12, true)
+      addText(selectedArticle.reasoning, 11)
+      yPosition += 5
+    }
+
+    // Add source
+    addText(`Source: ${selectedArticle.source || 'Unknown'}`, 10)
+
+    // Add link
+    addText(`Link: ${selectedArticle.link}`, 9)
+
+    // Generate filename from title (sanitize it)
+    const filename = `${selectedArticle.title.substring(0, 50).replace(/[^a-z0-9]/gi, '_')}.pdf`
+
+    // Download the PDF
+    doc.save(filename)
+  }
 
   // Sorting logic
   const handleSort = (field: SortField) => {
@@ -360,16 +431,22 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
                 Source: <span className="font-medium">{selectedArticle?.source || 'Unknown'}</span>
               </p>
             </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link
-                href={selectedArticle?.link || '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <IconExternalLink className="size-4 mr-2" />
-                Read Full Article
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={downloadPDF}>
+                <IconDownload className="size-4 mr-2" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link
+                  href={selectedArticle?.link || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <IconExternalLink className="size-4 mr-2" />
+                  Read Full Article
+                </Link>
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
