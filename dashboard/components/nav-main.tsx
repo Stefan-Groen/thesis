@@ -27,12 +27,15 @@ export function NavMain({
   labelIcon?: Icon
   labelUrl?: string
 }) {
+  // Capitalize the icon component for JSX rendering
+  const LabelIcon = labelIcon
+
   return (
     <SidebarGroup>
       {label && (
         <SidebarGroupLabel asChild>
           <Link href={labelUrl || "#"} className="flex items-center gap-2">
-            {labelIcon && <labelIcon className="size-4" />}
+            {LabelIcon && <LabelIcon className="size-4" />}
             <span>{label}</span>
           </Link>
         </SidebarGroupLabel>

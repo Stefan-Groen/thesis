@@ -217,7 +217,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
           <CardHeader>
             <CardDescription>New Since Last Visit</CardDescription>
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.newSinceLastVisit.toLocaleString()}
+              {(stats.newSinceLastVisit ?? 0).toLocaleString()}
             </CardTitle>
             <CardAction>
               <Badge variant="outline" className="text-purple-600 dark:text-purple-400">
