@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       ),
       published_counts AS (
         SELECT
-          date_trunc('day', date_published)::date as date,
+          date_trunc('day', date_published AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Amsterdam')::date as date,
           COUNT(*) as count
         FROM articles
         WHERE
@@ -42,11 +42,11 @@ export async function GET(request: NextRequest) {
           AND date_published IS NOT NULL
           AND classification != 'OUTDATED'
           AND status != 'OUTDATED'
-        GROUP BY date_trunc('day', date_published)
+        GROUP BY date_trunc('day', date_published AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Amsterdam')
       ),
       classified_counts AS (
         SELECT
-          date_trunc('day', classification_date)::date as date,
+          date_trunc('day', classification_date AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Amsterdam')::date as date,
           COUNT(*) as count
         FROM articles
         WHERE
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
           AND classification_date IS NOT NULL
           AND classification != 'OUTDATED'
           AND status != 'OUTDATED'
-        GROUP BY date_trunc('day', classification_date)
+        GROUP BY date_trunc('day', classification_date AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Amsterdam')
       )
       SELECT
         ds.date,

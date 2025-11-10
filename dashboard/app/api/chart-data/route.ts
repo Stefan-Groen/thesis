@@ -43,7 +43,8 @@ export async function GET(request: NextRequest) {
     // Determine the date truncation function based on interval
     // date_trunc() groups dates by day, week, or month
     // Using date_published (when article was published)
-    const truncFunc = `date_trunc('${interval}', date_published)`
+    // Convert to Europe/Amsterdam timezone before truncating to get correct local dates
+    const truncFunc = `date_trunc('${interval}', date_published AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Amsterdam')`
 
     // SQL query to get counts grouped by publication date
     // Only includes Threats and Opportunities (excludes Neutral and OUTDATED)
