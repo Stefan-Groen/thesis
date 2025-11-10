@@ -26,7 +26,7 @@ async function getThreatArticles(): Promise<Article[]> {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
     const res = await fetch(`${baseUrl}/api/articles?classification=Threat&limit=1000`, {
-      cache: 'no-store'
+      next: { revalidate: 30 }
     })
 
     if (!res.ok) {
