@@ -57,9 +57,9 @@ export default auth((req) => {
    *
    * These pages anyone can see without logging in:
    * - /login - The login page itself
-   * - /api/auth/* - NextAuth API routes (needed for login to work)
+   * - /api/* - All API routes (they handle their own auth if needed)
    */
-  const isPublicPath = pathname === "/login" || pathname.startsWith("/api/auth")
+  const isPublicPath = pathname === "/login" || pathname.startsWith("/api")
 
   /**
    * Handle different scenarios
