@@ -18,6 +18,9 @@ import { Badge } from "@/components/ui/badge"
 import type { Article } from "@/lib/types"
 import { query } from "@/lib/db"
 
+// Revalidate this page every 30 seconds
+export const revalidate = 30
+
 /**
  * Fetch user-uploaded articles directly from database
  */
@@ -26,7 +29,7 @@ async function getUserUploadedArticles(): Promise<Article[]> {
     const sql = `
       SELECT
         id, title, link, summary, source, classification, explanation, reasoning,
-        date_published, classification_date, status
+        date_published, classification_date, status, starred
       FROM articles
       WHERE source IN ('imported', 'uploaded')
       AND classification != 'OUTDATED' AND status != 'OUTDATED'

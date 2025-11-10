@@ -69,6 +69,9 @@ export async function PATCH(
     revalidatePath('/dashboard/threats')
     revalidatePath('/dashboard/opportunities')
     revalidatePath('/dashboard/neutral')
+    revalidatePath('/dashboard/today')
+    revalidatePath('/dashboard/backlog')
+    revalidatePath('/dashboard/user_uploaded')
 
     // Return the new starred status
     return NextResponse.json({

@@ -18,6 +18,9 @@ import { Badge } from "@/components/ui/badge"
 import type { Article } from "@/lib/types"
 import { query } from "@/lib/db"
 
+// Revalidate this page every 30 seconds
+export const revalidate = 30
+
 /**
  * Fetch articles published today directly from database
  */
@@ -26,7 +29,7 @@ async function getTodayArticles(): Promise<Article[]> {
     const sql = `
       SELECT
         id, title, link, summary, source, classification, explanation, reasoning,
-        date_published, classification_date, status
+        date_published, classification_date, status, starred
       FROM articles
       WHERE DATE(date_published) = CURRENT_DATE
       AND classification != 'OUTDATED' AND status != 'OUTDATED'
