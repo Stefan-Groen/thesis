@@ -4,74 +4,16 @@
  * This is the top bar of the dashboard that shows:
  * - App title
  * - Navigation links (Thesis, GitHub, LinkedIn)
- * - User info and logout button
- *
- * Now with Authentication! 🔐
- * We show the logged-in user's name and a logout button.
  */
 
 "use client"
 
-import { IconBrandGithub, IconBrandLinkedin, IconFileText, IconLogout, IconUser } from "@tabler/icons-react"
+import { IconBrandGithub, IconBrandLinkedin, IconFileText } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
-import { useSession, signOut } from "next-auth/react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 export function SiteHeader() {
-  /**
-   * Get the current session
-   *
-   * useSession() is a React hook from NextAuth that gives us:
-   * - session.data: The user's session data (if logged in)
-   * - session.status: "loading", "authenticated", or "unauthenticated"
-   *
-   * Think of it like checking your ticket at a concert:
-   * - If you have a valid ticket → session.data has your info
-   * - If not → session.data is null
-   */
-  const { data: session, status } = useSession()
-
-  /**
-   * Handle logout
-   *
-   * When user clicks logout:
-   * 1. Call NextAuth's signOut() function
-   * 2. It clears the session cookie
-   * 3. Redirects to login page
-   * 4. User is now logged out!
-   */
-  const handleLogout = async () => {
-    await signOut({
-      callbackUrl: "/login", // Where to go after logout
-    })
-  }
-
-  /**
-   * Get user's initials for avatar
-   *
-   * If user's name is "John Doe", this returns "JD"
-   * If user's name is "Stefan", this returns "S"
-   * Used to show a nice circle with initials instead of a photo
-   */
-  const getUserInitials = (name: string | null | undefined) => {
-    if (!name) return "?"
-
-    const parts = name.split(" ")
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
-    }
-    return name.substring(0, 2).toUpperCase()
-  }
 
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
@@ -123,56 +65,6 @@ export function SiteHeader() {
               LinkedIn
             </a>
           </Button>
-
-          {/* User Menu with Avatar and Logout */}
-          {status === "authenticated" && session?.user && (
-            <>
-              <Separator orientation="vertical" className="h-6 mx-2" />
-
-              {/* User Dropdown Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {getUserInitials(session.user.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  {/* User Info */}
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {session.user.name || session.user.username}
-                      </p>
-                      {session.user.email && (
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {session.user.email}
-                        </p>
-                      )}
-                      <p className="text-xs leading-none text-muted-foreground">
-                        @{session.user.username}
-                      </p>
-                    </div>
-                  </DropdownMenuLabel>
-
-                  <DropdownMenuSeparator />
-
-                  {/* Logout Button */}
-                  <DropdownMenuItem
-                    className="text-red-600 dark:text-red-400 cursor-pointer"
-                    onClick={handleLogout}
-                  >
-                    <IconLogout className="size-4 mr-2" />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          )}
         </div>
       </div>
     </header>
