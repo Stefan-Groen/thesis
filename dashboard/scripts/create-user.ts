@@ -8,6 +8,13 @@
  *   npx tsx scripts/create-user.ts
  */
 
+// Load environment variables from .env.local file
+import dotenv from 'dotenv'
+import path from 'path'
+
+// Load .env.local file from the dashboard directory
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') })
+
 import bcrypt from 'bcrypt'
 import { query } from '@/lib/db'
 import readline from 'readline'
