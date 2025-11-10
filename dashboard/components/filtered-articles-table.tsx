@@ -13,7 +13,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload } from "@tabler/icons-react"
+import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload, IconStar, IconStarFilled } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
 import { jsPDF } from "jspdf"
 
@@ -56,6 +56,57 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   const [pageSize, setPageSize] = React.useState(30)
   const [sortField, setSortField] = React.useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(null)
+
+  // Track starred status locally for optimistic UI updates
+  const [starredArticles, setStarredArticles] = React.useState<Record<number, boolean>>(() => {
+    const initial: Record<number, boolean> = {}
+    articles.forEach(article => {
+      initial[article.id] = article.starred
+    })
+    return initial
+  })
+
+  // Update starred articles when articles prop changes
+  React.useEffect(() => {
+    const updated: Record<number, boolean> = {}
+    articles.forEach(article => {
+      updated[article.id] = article.starred
+    })
+    setStarredArticles(updated)
+  }, [articles])
+
+  // Toggle starred status
+  const toggleStar = async (articleId: number, event: React.MouseEvent) => {
+    event.stopPropagation() // Prevent row click
+
+    // Optimistic update
+    setStarredArticles(prev => ({
+      ...prev,
+      [articleId]: !prev[articleId]
+    }))
+
+    try {
+      const response = await fetch(`/api/articles/${articleId}/star`, {
+        method: 'PATCH',
+      })
+
+      if (!response.ok) {
+        // Revert on error
+        setStarredArticles(prev => ({
+          ...prev,
+          [articleId]: !prev[articleId]
+        }))
+        console.error('Failed to toggle star')
+      }
+    } catch (error) {
+      // Revert on error
+      setStarredArticles(prev => ({
+        ...prev,
+        [articleId]: !prev[articleId]
+      }))
+      console.error('Error toggling star:', error)
+    }
+  }
 
   // Function to generate and download PDF
   const downloadPDF = () => {
@@ -258,6 +309,9 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
                     <SortIcon field="classification" />
                   </button>
                 </TableHead>
+                <TableHead className="w-12 text-center">
+                  <IconStar className="size-4 mx-auto" />
+                </TableHead>
                 <TableHead>
                   <button
                     onClick={() => handleSort('title')}
@@ -298,6 +352,21 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
                 {/* Classification Badge */}
                 <TableCell>
                   <ClassificationBadge classification={article.classification} />
+                </TableCell>
+
+                {/* Star Button */}
+                <TableCell onClick={(e) => e.stopPropagation()}>
+                  <button
+                    onClick={(e) => toggleStar(article.id, e)}
+                    className="flex items-center justify-center hover:scale-110 transition-transform"
+                    aria-label={starredArticles[article.id] ? "Unstar article" : "Star article"}
+                  >
+                    {starredArticles[article.id] ? (
+                      <IconStarFilled className="size-5 text-yellow-500" />
+                    ) : (
+                      <IconStar className="size-5 text-muted-foreground hover:text-yellow-500" />
+                    )}
+                  </button>
                 </TableCell>
 
                 {/* Article Title */}

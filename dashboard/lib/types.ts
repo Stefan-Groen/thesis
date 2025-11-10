@@ -25,6 +25,7 @@ export interface Stats {
   neutral: number
   unclassified: number
   articlesToday: number
+  starred: number
 }
 
 // Article from database
@@ -40,6 +41,7 @@ export interface Article {
   date_published: string | null
   classification_date: string | null
   status: string
+  starred: boolean
 }
 
 // Chart data point (for bar chart - only threats and opportunities)

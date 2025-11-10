@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50', 10)
     const offset = parseInt(searchParams.get('offset') || '0', 10)
     const classificationFilter = searchParams.get('classification')
+    const starredFilter = searchParams.get('starred') === 'true'
 
     // Build SQL query dynamically based on filters
     let sql = `
@@ -50,7 +51,8 @@ export async function GET(request: NextRequest) {
         reasoning,
         date_published,
         classification_date,
-        status
+        status,
+        starred
       FROM articles
     `
 
@@ -60,6 +62,13 @@ export async function GET(request: NextRequest) {
 
     // Always exclude OUTDATED articles
     sql += ` WHERE classification != 'OUTDATED' AND status != 'OUTDATED'`
+
+    // Add starred filter if provided
+    if (starredFilter) {
+      sql += ` AND starred = $${paramIndex}`
+      params.push(true)
+      paramIndex++
+    }
 
     // Add classification filter if provided
     if (classificationFilter) {
@@ -81,10 +90,18 @@ export async function GET(request: NextRequest) {
     // Also get the total count for pagination
     let countSql = `SELECT COUNT(*) as total FROM articles WHERE classification != 'OUTDATED' AND status != 'OUTDATED'`
     const countParams: any[] = []
+    let countParamIndex = 1
+
+    if (starredFilter) {
+      countSql += ` AND starred = $${countParamIndex}`
+      countParams.push(true)
+      countParamIndex++
+    }
 
     if (classificationFilter) {
-      countSql += ` AND classification = $1`
+      countSql += ` AND classification = $${countParamIndex}`
       countParams.push(classificationFilter)
+      countParamIndex++
     }
 
     const countResult = await query(countSql, countParams)
