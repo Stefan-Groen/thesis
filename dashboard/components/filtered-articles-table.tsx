@@ -13,7 +13,8 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload, IconStar, IconStarFilled } from "@tabler/icons-react"
+import { useRouter } from "next/navigation"
+import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload, IconStar, IconStarFilled, IconSearch } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
 import { jsPDF } from "jspdf"
 
@@ -41,6 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 interface FilteredArticlesTableProps {
   articles: Article[]
@@ -51,11 +53,13 @@ type SortField = 'classification' | 'title' | 'date_published' | 'source'
 type SortDirection = 'asc' | 'desc' | null
 
 export function FilteredArticlesTable({ articles, classification = 'All' }: FilteredArticlesTableProps) {
+  const router = useRouter()
   const [selectedArticle, setSelectedArticle] = React.useState<Article | null>(null)
   const [currentPage, setCurrentPage] = React.useState(1)
   const [pageSize, setPageSize] = React.useState(30)
   const [sortField, setSortField] = React.useState<SortField | null>(null)
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(null)
+  const [searchTerm, setSearchTerm] = React.useState('')
 
   // Track starred status locally for optimistic UI updates
   const [starredArticles, setStarredArticles] = React.useState<Record<number, boolean>>(() => {
@@ -97,6 +101,9 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
           [articleId]: !prev[articleId]
         }))
         console.error('Failed to toggle star')
+      } else {
+        // Refresh the page data after successful star toggle
+        router.refresh()
       }
     } catch (error) {
       // Revert on error
@@ -234,14 +241,25 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
     })
   }, [articles, sortField, sortDirection])
 
-  // Filter articles based on starred status when on starred page
+  // Filter articles based on starred status and search term
   const filteredArticles = React.useMemo(() => {
+    let filtered = sortedArticles
+
     // On starred page, filter out articles that have been unstarred
     if (classification === 'Starred') {
-      return sortedArticles.filter(article => starredArticles[article.id] === true)
+      filtered = filtered.filter(article => starredArticles[article.id] === true)
     }
-    return sortedArticles
-  }, [sortedArticles, starredArticles, classification])
+
+    // Apply search filter if search term exists
+    if (searchTerm.trim()) {
+      const lowerSearchTerm = searchTerm.toLowerCase()
+      filtered = filtered.filter(article =>
+        article.title.toLowerCase().includes(lowerSearchTerm)
+      )
+    }
+
+    return filtered
+  }, [sortedArticles, starredArticles, classification, searchTerm])
 
   // Pagination logic
   const totalPages = pageSize === -1 ? 1 : Math.ceil(filteredArticles.length / pageSize)
@@ -255,13 +273,24 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
     setCurrentPage(1)
   }
 
+  // Reset to first page when search term changes
+  React.useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
+
   // If no articles, show a message
   if (filteredArticles.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
-        <p className="text-muted-foreground text-lg">No {classification?.toLowerCase()} articles found</p>
+        <p className="text-muted-foreground text-lg">
+          {searchTerm.trim()
+            ? `No articles matching "${searchTerm}"`
+            : `No ${classification?.toLowerCase()} articles found`}
+        </p>
         <p className="text-muted-foreground text-sm mt-2">
-          {classification === 'Starred'
+          {searchTerm.trim()
+            ? 'Try a different search term'
+            : classification === 'Starred'
             ? 'Star some articles to see them here'
             : 'Run your Python script to fetch and classify more articles'}
         </p>
@@ -283,11 +312,21 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   return (
     <>
       <div className="space-y-4">
-        {/* Pagination controls - Top */}
-        <div className="flex items-center justify-between">
+        {/* Search and Pagination controls - Top */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Showing {startIndex + 1}-{Math.min(endIndex, filteredArticles.length)} of {filteredArticles.length}
+            <div className="relative flex-1 sm:w-64">
+              <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search articles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <span className="text-sm text-muted-foreground whitespace-nowrap">
+              {filteredArticles.length} {filteredArticles.length === 1 ? 'article' : 'articles'}
             </span>
           </div>
           <div className="flex items-center gap-2">
