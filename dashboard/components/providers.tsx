@@ -24,6 +24,7 @@
 "use client"
 
 import { SessionProvider } from "next-auth/react"
+import { Toaster } from "sonner"
 import { ReactNode } from "react"
 
 interface ProvidersProps {
@@ -33,6 +34,7 @@ interface ProvidersProps {
 export function Providers({ children }: ProvidersProps) {
   return (
     <SessionProvider>
+      <Toaster position="bottom-right" duration={5000} />
       {children}
     </SessionProvider>
   )

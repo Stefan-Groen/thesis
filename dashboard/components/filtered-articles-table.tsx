@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation"
 import { IconExternalLink, IconX, IconChevronUp, IconChevronDown, IconSelector, IconDownload, IconStar, IconStarFilled, IconSearch } from "@tabler/icons-react"
 import type { Article } from "@/lib/types"
 import { jsPDF } from "jspdf"
+import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -83,10 +84,13 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   const toggleStar = async (articleId: number, event: React.MouseEvent) => {
     event.stopPropagation() // Prevent row click
 
+    const wasStarred = starredArticles[articleId]
+    const willBeStarred = !wasStarred
+
     // Optimistic update
     setStarredArticles(prev => ({
       ...prev,
-      [articleId]: !prev[articleId]
+      [articleId]: willBeStarred
     }))
 
     try {
@@ -98,19 +102,30 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
         // Revert on error
         setStarredArticles(prev => ({
           ...prev,
-          [articleId]: !prev[articleId]
+          [articleId]: wasStarred
         }))
-        console.error('Failed to toggle star')
+        toast.error('Failed to update article')
       } else {
+        // Show success toast
+        if (willBeStarred) {
+          toast.success('Article starred')
+        } else {
+          toast.success('Article unstarred')
+        }
+
         // Refresh the page data after successful star toggle
-        router.refresh()
+        // Add a small delay to ensure the database update is complete
+        setTimeout(() => {
+          router.refresh()
+        }, 100)
       }
     } catch (error) {
       // Revert on error
       setStarredArticles(prev => ({
         ...prev,
-        [articleId]: !prev[articleId]
+        [articleId]: wasStarred
       }))
+      toast.error('Failed to update article')
       console.error('Error toggling star:', error)
     }
   }
@@ -278,26 +293,6 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
     setCurrentPage(1)
   }, [searchTerm])
 
-  // If no articles, show a message
-  if (filteredArticles.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
-        <p className="text-muted-foreground text-lg">
-          {searchTerm.trim()
-            ? `No articles matching "${searchTerm}"`
-            : `No ${classification?.toLowerCase()} articles found`}
-        </p>
-        <p className="text-muted-foreground text-sm mt-2">
-          {searchTerm.trim()
-            ? 'Try a different search term'
-            : classification === 'Starred'
-            ? 'Star some articles to see them here'
-            : 'Run your Python script to fetch and classify more articles'}
-        </p>
-      </div>
-    )
-  }
-
   // Helper to render sort icon
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) {
@@ -312,10 +307,11 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
   return (
     <>
       <div className="space-y-4">
-        {/* Search and Pagination controls - Top */}
+        {/* Search and Pagination controls - Top - Always visible */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 sm:w-64">
+          {/* Left side: Search box */}
+          <div className="flex items-center gap-2 order-1">
+            <div className="relative w-full sm:w-64">
               <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
               <Input
                 type="text"
@@ -329,7 +325,9 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
               {filteredArticles.length} {filteredArticles.length === 1 ? 'article' : 'articles'}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Right side: Rows per page */}
+          <div className="flex items-center gap-2 order-2">
             <span className="text-sm text-muted-foreground">Rows per page:</span>
             <Select value={pageSize === -1 ? 'all' : pageSize.toString()} onValueChange={handlePageSizeChange}>
               <SelectTrigger className="w-24">
@@ -344,6 +342,25 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
             </Select>
           </div>
         </div>
+
+        {/* Show empty state if no filtered articles */}
+        {filteredArticles.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center border rounded-lg">
+            <p className="text-muted-foreground text-lg">
+              {searchTerm.trim()
+                ? `No articles matching "${searchTerm}"`
+                : `No ${classification?.toLowerCase()} articles found`}
+            </p>
+            <p className="text-muted-foreground text-sm mt-2">
+              {searchTerm.trim()
+                ? 'Try a different search term'
+                : classification === 'Starred'
+                ? 'Star some articles to see them here'
+                : 'Run your Python script to fetch and classify more articles'}
+            </p>
+          </div>
+        ) : (
+          <>
 
         {/* Table */}
         <div className="overflow-hidden rounded-lg border">
@@ -508,6 +525,8 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
           </Button>
         </div>
       )}
+          </>
+        )}
     </div>
 
       {/* Article Detail Modal */}
