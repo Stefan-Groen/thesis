@@ -35,11 +35,6 @@ import {
 const data = {
   navMain: [
     {
-      title: "Home",
-      url: "/dashboard",
-      icon: IconHome,
-    },
-    {
       title: "All Articles",
       url: "/dashboard/articles",
       icon: IconNews,
@@ -99,7 +94,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain
+          items={data.navMain}
+          label="Home"
+          labelIcon={IconHome}
+          labelUrl="/dashboard"
+        />
       </SidebarContent>
       <SidebarFooter className="p-2">
         {/* Theme Toggle Slider */}

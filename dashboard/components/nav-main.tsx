@@ -6,6 +6,7 @@ import { type Icon } from "@tabler/icons-react"
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -13,20 +14,34 @@ import {
 
 export function NavMain({
   items,
+  label,
+  labelIcon,
+  labelUrl,
 }: {
   items: {
     title: string
     url: string
     icon?: Icon
   }[]
+  label?: string
+  labelIcon?: Icon
+  labelUrl?: string
 }) {
   return (
     <SidebarGroup>
+      {label && (
+        <SidebarGroupLabel asChild>
+          <Link href={labelUrl || "#"} className="flex items-center gap-2">
+            {labelIcon && <labelIcon className="size-4" />}
+            <span>{label}</span>
+          </Link>
+        </SidebarGroupLabel>
+      )}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title} className="pl-6">
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
