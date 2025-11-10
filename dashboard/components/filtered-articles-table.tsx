@@ -63,17 +63,36 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
 
     const doc = new jsPDF()
     const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
     const margin = 15
     const maxWidth = pageWidth - 2 * margin
+    const bottomMargin = 20 // Space to leave at bottom of page
     let yPosition = 20
 
-    // Helper function to add text with word wrapping
+    // Helper function to check if we need a new page
+    const checkPageOverflow = (estimatedHeight: number) => {
+      if (yPosition + estimatedHeight > pageHeight - bottomMargin) {
+        doc.addPage()
+        yPosition = 20
+      }
+    }
+
+    // Helper function to add text with word wrapping and automatic page breaks
     const addText = (text: string, fontSize: number = 11, isBold: boolean = false) => {
       doc.setFontSize(fontSize)
       doc.setFont('helvetica', isBold ? 'bold' : 'normal')
       const lines = doc.splitTextToSize(text, maxWidth)
-      doc.text(lines, margin, yPosition)
-      yPosition += lines.length * (fontSize * 0.5) + 5
+      const lineHeight = fontSize * 0.5
+      const totalHeight = lines.length * lineHeight
+
+      // Check if we need to split across pages
+      for (let i = 0; i < lines.length; i++) {
+        checkPageOverflow(lineHeight + 5)
+        doc.text(lines[i], margin, yPosition)
+        yPosition += lineHeight
+      }
+
+      yPosition += 5 // Add some spacing after text block
     }
 
     // Add title
@@ -104,20 +123,17 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
 
     // Add LLM Reasoning
     if (selectedArticle.reasoning) {
-      // Check if we need a new page
-      if (yPosition > 250) {
-        doc.addPage()
-        yPosition = 20
-      }
       addText('LLM Reasoning', 12, true)
       addText(selectedArticle.reasoning, 11)
       yPosition += 5
     }
 
     // Add source
+    checkPageOverflow(15)
     addText(`Source: ${selectedArticle.source || 'Unknown'}`, 10)
 
     // Add link
+    checkPageOverflow(15)
     addText(`Link: ${selectedArticle.link}`, 9)
 
     // Generate filename from title (sanitize it)
