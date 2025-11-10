@@ -1,27 +1,27 @@
 /**
- * Middleware - The Security Guard 🛡️
+ * Proxy - The Security Guard 🛡️
  *
- * This file runs BEFORE every request to your app.
+ * This file runs BEFORE every request to your app (Next.js 16 renamed middleware to proxy).
  * It checks if the user is logged in and decides what to do.
  *
  * Think of it like a bouncer at a club:
  * - Has a ticket (session)? Come in!
  * - No ticket? Go to the entrance (login page)
  *
- * What is middleware?
- * In web apps, middleware is code that runs "in the middle" - between the request
+ * What is proxy/middleware?
+ * In web apps, proxy is code that runs "in the middle" - between the request
  * coming in and the page being shown. It's perfect for authentication checks!
  *
  * Why do we need this?
- * Without middleware, anyone could just type "yoursite.com/dashboard" and see everything!
- * With middleware, we check: "Are you logged in? No? Back to login!"
+ * Without proxy, anyone could just type "yoursite.com/dashboard" and see everything!
+ * With proxy, we check: "Are you logged in? No? Back to login!"
  */
 
 import { auth } from "@/auth"
 import { NextResponse } from "next/server"
 
 /**
- * Middleware function
+ * Proxy function
  *
  * This function runs on EVERY request that matches the paths in the config below.
  *
@@ -99,9 +99,9 @@ export default auth((req) => {
 })
 
 /**
- * Middleware Configuration
+ * Proxy Configuration
  *
- * This tells Next.js which routes this middleware should run on.
+ * This tells Next.js which routes this proxy should run on.
  *
  * The matcher uses pattern matching:
  * - "/dashboard/:path*" → /dashboard and ALL sub-paths
