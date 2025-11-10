@@ -26,6 +26,7 @@ export interface Stats {
   unclassified: number
   articlesToday: number
   starred: number
+  newSinceLastVisit: number
 }
 
 // Article from database
