@@ -47,19 +47,25 @@ export async function GET(request: NextRequest) {
 
     // SQL query to get counts grouped by publication date
     // Only includes Threats and Opportunities (excludes Neutral and OUTDATED)
+    // Uses a date series to ensure all dates in the range are included (even with 0 counts)
     const sql = `
+      WITH date_series AS (
+        SELECT generate_series(
+          CURRENT_DATE - INTERVAL '${days} days',
+          CURRENT_DATE,
+          '1 day'::interval
+        )::date AS date
+      )
       SELECT
-        ${truncFunc}::date as date,
-        COUNT(*) FILTER (WHERE classification = 'Threat') as threats,
-        COUNT(*) FILTER (WHERE classification = 'Opportunity') as opportunities
-      FROM articles
-      WHERE
-        date_published >= NOW() - INTERVAL '${days} days'
-        AND date_published IS NOT NULL
-        AND classification IN ('Threat', 'Opportunity')
-        AND status != 'OUTDATED'
-      GROUP BY ${truncFunc}
-      ORDER BY date ASC;
+        ds.date,
+        COALESCE(COUNT(*) FILTER (WHERE a.classification = 'Threat'), 0) as threats,
+        COALESCE(COUNT(*) FILTER (WHERE a.classification = 'Opportunity'), 0) as opportunities
+      FROM date_series ds
+      LEFT JOIN articles a ON ${truncFunc}::date = ds.date
+        AND a.classification IN ('Threat', 'Opportunity')
+        AND a.status != 'OUTDATED'
+      GROUP BY ds.date
+      ORDER BY ds.date ASC;
     `
 
     // Execute query
@@ -72,7 +78,6 @@ export async function GET(request: NextRequest) {
       opportunities: Number(row.opportunities),
     }))
 
-    // If no data, return an empty array (chart will show "no data" message)
     return NextResponse.json(chartData)
 
   } catch (error) {

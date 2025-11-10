@@ -22,73 +22,58 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const days = parseInt(searchParams.get('days') || '7', 10)
 
-    // Get published articles count per day (excluding OUTDATED)
-    const publishedSql = `
+    // Use a date series to ensure all dates are included (even with 0 counts)
+    // This ensures today's date always appears in the chart
+    const sql = `
+      WITH date_series AS (
+        SELECT generate_series(
+          CURRENT_DATE - INTERVAL '${days} days',
+          CURRENT_DATE,
+          '1 day'::interval
+        )::date AS date
+      ),
+      published_counts AS (
+        SELECT
+          date_trunc('day', date_published)::date as date,
+          COUNT(*) as count
+        FROM articles
+        WHERE
+          date_published >= CURRENT_DATE - INTERVAL '${days} days'
+          AND date_published IS NOT NULL
+          AND classification != 'OUTDATED'
+          AND status != 'OUTDATED'
+        GROUP BY date_trunc('day', date_published)
+      ),
+      classified_counts AS (
+        SELECT
+          date_trunc('day', classification_date)::date as date,
+          COUNT(*) as count
+        FROM articles
+        WHERE
+          classification_date >= CURRENT_DATE - INTERVAL '${days} days'
+          AND classification_date IS NOT NULL
+          AND classification != 'OUTDATED'
+          AND status != 'OUTDATED'
+        GROUP BY date_trunc('day', classification_date)
+      )
       SELECT
-        date_trunc('day', date_published)::date as date,
-        COUNT(*) as count
-      FROM articles
-      WHERE
-        date_published >= NOW() - INTERVAL '${days} days'
-        AND date_published IS NOT NULL
-        AND classification != 'OUTDATED'
-        AND status != 'OUTDATED'
-      GROUP BY date_trunc('day', date_published)
-      ORDER BY date ASC;
+        ds.date,
+        COALESCE(pc.count, 0) as published,
+        COALESCE(cc.count, 0) as classified
+      FROM date_series ds
+      LEFT JOIN published_counts pc ON ds.date = pc.date
+      LEFT JOIN classified_counts cc ON ds.date = cc.date
+      ORDER BY ds.date ASC;
     `
 
-    // Get classified articles count per day (excluding OUTDATED)
-    const classifiedSql = `
-      SELECT
-        date_trunc('day', classification_date)::date as date,
-        COUNT(*) as count
-      FROM articles
-      WHERE
-        classification_date >= NOW() - INTERVAL '${days} days'
-        AND classification_date IS NOT NULL
-        AND classification != 'OUTDATED'
-        AND status != 'OUTDATED'
-      GROUP BY date_trunc('day', classification_date)
-      ORDER BY date ASC;
-    `
+    const result = await query(sql)
 
-    const [publishedResult, classifiedResult] = await Promise.all([
-      query(publishedSql),
-      query(classifiedSql)
-    ])
-
-    // Create a map of all dates
-    const dateMap = new Map<string, { published: number, classified: number }>()
-
-    // Add published counts
-    publishedResult.rows.forEach((row) => {
-      const dateStr = row.date?.toISOString().split('T')[0] || ''
-      if (dateStr) {
-        dateMap.set(dateStr, { published: Number(row.count), classified: 0 })
-      }
-    })
-
-    // Add classified counts
-    classifiedResult.rows.forEach((row) => {
-      const dateStr = row.date?.toISOString().split('T')[0] || ''
-      if (dateStr) {
-        const existing = dateMap.get(dateStr)
-        if (existing) {
-          existing.classified = Number(row.count)
-        } else {
-          dateMap.set(dateStr, { published: 0, classified: Number(row.count) })
-        }
-      }
-    })
-
-    // Convert to array and sort by date
-    const activityData = Array.from(dateMap.entries())
-      .map(([date, counts]) => ({
-        date,
-        published: counts.published,
-        classified: counts.classified,
-      }))
-      .sort((a, b) => a.date.localeCompare(b.date))
+    // Format the data for the chart
+    const activityData = result.rows.map((row) => ({
+      date: row.date?.toISOString().split('T')[0] || '',
+      published: Number(row.published),
+      classified: Number(row.classified),
+    }))
 
     return NextResponse.json(activityData)
 
