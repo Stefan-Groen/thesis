@@ -306,38 +306,31 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
 
       {/* Article Detail Modal */}
       <Dialog open={!!selectedArticle} onOpenChange={() => setSelectedArticle(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl pr-8">
-              {selectedArticle?.title}
-            </DialogTitle>
-            <DialogDescription>
-              Published: {selectedArticle?.date_published
-                ? new Date(selectedArticle.date_published).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                  })
-                : 'Unknown'}
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col p-0">
+          <div className="px-6 pt-6">
+            <DialogHeader>
+              <DialogTitle className="text-xl pr-8">
+                {selectedArticle?.title}
+              </DialogTitle>
+              <DialogDescription>
+                Published: {selectedArticle?.date_published
+                  ? new Date(selectedArticle.date_published).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Unknown'}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-          <div className="space-y-6 mt-4">
+          {/* Scrollable content area */}
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
             {/* Classification */}
             <div>
               <h3 className="text-sm font-semibold mb-2">Classification</h3>
               <ClassificationBadge classification={selectedArticle?.classification || ''} />
             </div>
-
-            {/* Summary */}
-            {selectedArticle?.summary && (
-              <div>
-                <h3 className="text-sm font-semibold mb-2">Summary</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {selectedArticle.summary}
-                </p>
-              </div>
-            )}
 
             {/* Explanation */}
             {selectedArticle?.explanation && (
@@ -358,25 +351,25 @@ export function FilteredArticlesTable({ articles, classification = 'All' }: Filt
                 </p>
               </div>
             )}
+          </div>
 
-            {/* Source and Link */}
-            <div className="flex items-center justify-between pt-4 border-t">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Source: <span className="font-medium">{selectedArticle?.source || 'Unknown'}</span>
-                </p>
-              </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link
-                  href={selectedArticle?.link || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IconExternalLink className="size-4 mr-2" />
-                  Read Full Article
-                </Link>
-              </Button>
+          {/* Sticky bottom section - Source and Link */}
+          <div className="border-t bg-background px-6 py-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                Source: <span className="font-medium">{selectedArticle?.source || 'Unknown'}</span>
+              </p>
             </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link
+                href={selectedArticle?.link || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <IconExternalLink className="size-4 mr-2" />
+                Read Full Article
+              </Link>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
