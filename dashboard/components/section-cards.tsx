@@ -175,8 +175,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
             title="Pending"
             value={stats.unclassified}
             total={stats.total}
-            color="hsl(0, 0%, 20%)"
-            icon={<IconClock className="size-5 text-slate-800 dark:text-slate-400" />}
+            color="hsl(0, 0%, 70%)"
+            icon={<IconClock className="size-5 text-slate-500 dark:text-slate-400" />}
             href="/dashboard/backlog"
           />
         </div>

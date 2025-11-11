@@ -35,23 +35,15 @@ export function RadialStatCard({
 }: RadialStatCardProps) {
   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
 
-  // Calculate the remaining (gray portion)
-  const remaining = total - value
-
-  // Chart data with both category value and remaining
+  // Simple chart data - just the value for display
   const chartData = [{
-    category: value,
-    remaining: remaining
+    value: 100 // Full semicircle
   }]
 
   const chartConfig = {
-    category: {
+    value: {
       label: title,
       color: color,
-    },
-    remaining: {
-      label: "Other",
-      color: "hsl(var(--muted))",
     },
   } satisfies ChartConfig
 
@@ -103,18 +95,9 @@ export function RadialStatCard({
                   }}
                 />
               </PolarRadiusAxis>
-              {/* Gray background layer - full semicircle */}
+              {/* Single color full semicircle */}
               <RadialBar
-                dataKey="remaining"
-                stackId="a"
-                cornerRadius={5}
-                fill="hsl(var(--muted))"
-                className="stroke-transparent stroke-2"
-              />
-              {/* Colored category layer on top */}
-              <RadialBar
-                dataKey="category"
-                stackId="a"
+                dataKey="value"
                 cornerRadius={5}
                 fill={color}
                 className="stroke-transparent stroke-2"
