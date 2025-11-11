@@ -113,7 +113,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
             title="Threats"
             value={stats.threats}
             total={stats.total}
-            color="hsl(var(--chart-1))"
+            color="hsl(0, 84%, 60%)"
             icon={<IconAlertTriangle className="size-5 text-red-600 dark:text-red-400" />}
             href="/dashboard/threats"
           />
@@ -125,7 +125,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
             title="Opportunities"
             value={stats.opportunities}
             total={stats.total}
-            color="hsl(var(--chart-2))"
+            color="hsl(142, 76%, 36%)"
             icon={<IconSparkles className="size-5 text-green-600 dark:text-green-400" />}
             href="/dashboard/opportunities"
           />
@@ -163,7 +163,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
             title="Neutral"
             value={stats.neutral}
             total={stats.total}
-            color="hsl(var(--chart-3))"
+            color="hsl(221, 83%, 53%)"
             icon={<IconCircle className="size-5 text-blue-600 dark:text-blue-400" />}
             href="/dashboard/neutral"
           />
@@ -175,8 +175,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
             title="Pending"
             value={stats.unclassified}
             total={stats.total}
-            color="hsl(var(--chart-4))"
-            icon={<IconClock className="size-5 text-orange-600 dark:text-orange-400" />}
+            color="hsl(0, 0%, 20%)"
+            icon={<IconClock className="size-5 text-slate-800 dark:text-slate-400" />}
             href="/dashboard/backlog"
           />
         </div>

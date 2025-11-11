@@ -35,12 +35,23 @@ export function RadialStatCard({
 }: RadialStatCardProps) {
   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
 
-  const chartData = [{ value: value, total: total }]
+  // Calculate the remaining (gray portion)
+  const remaining = total - value
+
+  // Chart data with both category value and remaining
+  const chartData = [{
+    category: value,
+    remaining: remaining
+  }]
 
   const chartConfig = {
-    value: {
+    category: {
       label: title,
       color: color,
+    },
+    remaining: {
+      label: "Other",
+      color: "hsl(var(--muted))",
     },
   } satisfies ChartConfig
 
@@ -54,17 +65,17 @@ export function RadialStatCard({
           </div>
           <CardDescription className="text-xs">{percentage}% of total</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center pb-4">
+        <CardContent className="flex flex-1 items-center justify-center pb-2">
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square w-full max-w-[140px]"
+            className="mx-auto aspect-square w-full max-w-[180px]"
           >
             <RadialBarChart
               data={chartData}
               startAngle={0}
-              endAngle={(parseFloat(percentage) / 100) * 360}
-              innerRadius={50}
-              outerRadius={70}
+              endAngle={180}
+              innerRadius={60}
+              outerRadius={90}
             >
               <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
                 <Label
@@ -74,14 +85,14 @@ export function RadialStatCard({
                         <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
                           <tspan
                             x={viewBox.cx}
-                            y={(viewBox.cy || 0) - 8}
+                            y={(viewBox.cy || 0) - 4}
                             className="fill-foreground text-2xl font-bold"
                           >
                             {value.toLocaleString()}
                           </tspan>
                           <tspan
                             x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 12}
+                            y={(viewBox.cy || 0) + 16}
                             className="fill-muted-foreground text-xs"
                           >
                             {title}
@@ -92,8 +103,18 @@ export function RadialStatCard({
                   }}
                 />
               </PolarRadiusAxis>
+              {/* Gray background layer - full semicircle */}
               <RadialBar
-                dataKey="value"
+                dataKey="remaining"
+                stackId="a"
+                cornerRadius={5}
+                fill="hsl(var(--muted))"
+                className="stroke-transparent stroke-2"
+              />
+              {/* Colored category layer on top */}
+              <RadialBar
+                dataKey="category"
+                stackId="a"
                 cornerRadius={5}
                 fill={color}
                 className="stroke-transparent stroke-2"
