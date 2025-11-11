@@ -69,11 +69,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">All articles in database</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <span className="text-7xl font-black tabular-nums text-foreground/30" style={{
-                WebkitTextStroke: '2px currentColor',
-                WebkitTextFillColor: 'transparent',
-                paintOrder: 'stroke fill'
-              }}>
+              <span className="text-7xl font-black tabular-nums text-foreground/20">
                 {stats.total.toLocaleString()}
               </span>
             </div>
@@ -94,11 +90,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">Articles published today</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <span className="text-7xl font-black tabular-nums text-foreground/30" style={{
-                WebkitTextStroke: '2px currentColor',
-                WebkitTextFillColor: 'transparent',
-                paintOrder: 'stroke fill'
-              }}>
+              <span className="text-7xl font-black tabular-nums text-foreground/20">
                 {stats.articlesToday.toLocaleString()}
               </span>
             </div>
@@ -131,27 +123,22 @@ export function SectionCards({ stats }: SectionCardsProps) {
 
         {/* Row 2 Left: Starred Articles Card - 4 cols wide */}
         <Link href="/dashboard/starred" className="@container/card @5xl/main:col-span-4 @5xl/main:row-span-1">
-          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
-            <CardHeader>
-              <CardDescription>Starred Articles</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                {stats.starred.toLocaleString()}
-              </CardTitle>
-              <CardAction>
-                <Badge variant="outline" className="text-yellow-600 dark:text-yellow-400">
-                  <IconStarFilled className="size-4" />
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full overflow-hidden relative">
+            <div className="absolute top-4 left-4 z-10">
+              <div className="flex items-center gap-2 mb-2">
+                <IconStarFilled className="size-5 text-yellow-600 dark:text-yellow-400" />
+                <Badge variant="outline" className="text-xs text-yellow-600 dark:text-yellow-400">
                   Favorites
                 </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
-              <div className="line-clamp-1 flex gap-2 font-medium">
-                Your starred articles
               </div>
-              <div className="text-muted-foreground">
-                Click to view starred articles
-              </div>
-            </CardFooter>
+              <CardTitle className="text-lg font-semibold mb-1">Starred Articles</CardTitle>
+              <CardDescription className="text-xs">Your starred articles</CardDescription>
+            </div>
+            <div className="absolute bottom-2 right-4 opacity-90">
+              <span className="text-7xl font-black tabular-nums text-foreground/20">
+                {stats.starred.toLocaleString()}
+              </span>
+            </div>
           </Card>
         </Link>
 
