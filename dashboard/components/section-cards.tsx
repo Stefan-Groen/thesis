@@ -16,8 +16,6 @@
  * ```
  */
 
-"use client"
-
 import Link from "next/link"
 import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled, IconClock } from "@tabler/icons-react"
 import type { Stats } from "@/lib/types"
@@ -32,7 +30,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { RadialStatCard } from "@/components/radial-stat-card"
-import CountUp from "@/components/count-up"
 
 // Props interface (like function parameters with type hints)
 interface SectionCardsProps {
@@ -72,14 +69,9 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">All articles in database</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <CountUp
-                from={0}
-                to={stats.total}
-                separator=","
-                direction="up"
-                duration={0.8}
-                className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent"
-              />
+              <span className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent">
+                {stats.total.toLocaleString()}
+              </span>
             </div>
           </Card>
         </Link>
@@ -98,14 +90,9 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">Articles published today</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <CountUp
-                from={0}
-                to={stats.articlesToday}
-                separator=","
-                direction="up"
-                duration={0.8}
-                className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent"
-              />
+              <span className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent">
+                {stats.articlesToday.toLocaleString()}
+              </span>
             </div>
           </Card>
         </Link>
