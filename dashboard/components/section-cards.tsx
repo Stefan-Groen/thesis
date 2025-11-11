@@ -69,7 +69,11 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">All articles in database</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <span className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent">
+              <span className="text-7xl font-black tabular-nums text-foreground/30" style={{
+                WebkitTextStroke: '2px currentColor',
+                WebkitTextFillColor: 'transparent',
+                paintOrder: 'stroke fill'
+              }}>
                 {stats.total.toLocaleString()}
               </span>
             </div>
@@ -90,7 +94,11 @@ export function SectionCards({ stats }: SectionCardsProps) {
               <CardDescription className="text-xs">Articles published today</CardDescription>
             </div>
             <div className="absolute bottom-2 right-4 opacity-90">
-              <span className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent">
+              <span className="text-7xl font-black tabular-nums text-foreground/30" style={{
+                WebkitTextStroke: '2px currentColor',
+                WebkitTextFillColor: 'transparent',
+                paintOrder: 'stroke fill'
+              }}>
                 {stats.articlesToday.toLocaleString()}
               </span>
             </div>
