@@ -17,7 +17,7 @@
  */
 
 import Link from "next/link"
-import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled } from "@tabler/icons-react"
+import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled, IconClock } from "@tabler/icons-react"
 import type { Stats } from "@/lib/types"
 
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { RadialStatCard } from "@/components/radial-stat-card"
 
 // Props interface (like function parameters with type hints)
 interface SectionCardsProps {
@@ -51,166 +52,135 @@ export function SectionCards({ stats }: SectionCardsProps) {
 
   return (
     <>
-      {/* First Row: Main Statistics - Total, Threats, Opportunities, Neutral (2+2+2+2=8) */}
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
-        {/* Total Articles Card - Clickable (2 cols) */}
-        <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Total Articles</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.total.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconNews className="size-4" />
-                All Time
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Total articles in database
-            </div>
-            <div className="text-muted-foreground">
-              Click to view all articles
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
+      {/* New Grid Layout: 8 columns, 2 rows */}
+      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8 @5xl/main:grid-rows-2">
 
-      {/* Threats Card - Clickable */}
-      <Link href="/dashboard/threats" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Threats</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.threats.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline" className="text-red-600 dark:text-red-400">
-                <IconAlertTriangle className="size-4" />
-                {threatPercentage}%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Articles classified as threats
-            </div>
-            <div className="text-muted-foreground">
-              Click to view all threats
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
+        {/* Total Articles Card - Row 1, 2 cols */}
+        <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+            <CardHeader>
+              <CardDescription>Total Articles</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                {stats.total.toLocaleString()}
+              </CardTitle>
+              <CardAction>
+                <Badge variant="outline">
+                  <IconNews className="size-4" />
+                  All Time
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                Total articles in database
+              </div>
+              <div className="text-muted-foreground">
+                Click to view all articles
+              </div>
+            </CardFooter>
+          </Card>
+        </Link>
 
-      {/* Opportunities Card - Clickable */}
-      <Link href="/dashboard/opportunities" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Opportunities</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.opportunities.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline" className="text-green-600 dark:text-green-400">
-                <IconSparkles className="size-4" />
-                {opportunityPercentage}%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Positive opportunities identified
-            </div>
-            <div className="text-muted-foreground">
-              Click to view all opportunities
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
+        {/* Added Today Card - Row 1, 2 cols */}
+        <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+            <CardHeader>
+              <CardDescription>Added Today</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                {stats.articlesToday.toLocaleString()}
+              </CardTitle>
+              <CardAction>
+                <Badge variant="outline">
+                  <IconCalendarEvent className="size-4" />
+                  Today
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                Articles published today
+              </div>
+              <div className="text-muted-foreground">
+                Click to view today's articles
+              </div>
+            </CardFooter>
+          </Card>
+        </Link>
 
-      {/* Neutral Card - Clickable */}
-      <Link href="/dashboard/neutral" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Neutral</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.neutral.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline" className="text-blue-600 dark:text-blue-400">
-                <IconCircle className="size-4" />
-                {neutralPercentage}%
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Informational articles
-            </div>
-            <div className="text-muted-foreground">
-              Click to view all neutral articles
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
-    </div>
+        {/* Starred Articles Card - 2 cols, 2 rows high */}
+        <Link href="/dashboard/starred" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-2">
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
+            <CardHeader>
+              <CardDescription>Starred Articles</CardDescription>
+              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                {stats.starred.toLocaleString()}
+              </CardTitle>
+              <CardAction>
+                <Badge variant="outline" className="text-yellow-600 dark:text-yellow-400">
+                  <IconStarFilled className="size-4" />
+                  Favorites
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className="flex-col items-start gap-1.5 text-sm">
+              <div className="line-clamp-1 flex gap-2 font-medium">
+                Your starred articles
+              </div>
+              <div className="text-muted-foreground">
+                Click to view starred articles
+              </div>
+            </CardFooter>
+          </Card>
+        </Link>
 
-    {/* Second Row: Articles Added Today and Starred Articles (2 cols each) */}
-    <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8">
-      <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Added Today</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.articlesToday.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline">
-                <IconCalendarEvent className="size-4" />
-                Today
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Articles published today
-            </div>
-            <div className="text-muted-foreground">
-              Click to view today's articles
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
+        {/* Threats Radial Card - Row 1, 1 col */}
+        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
+          <RadialStatCard
+            title="Threats"
+            value={stats.threats}
+            total={stats.total}
+            color="hsl(var(--chart-1))"
+            icon={<IconAlertTriangle className="size-5 text-red-600 dark:text-red-400" />}
+            href="/dashboard/threats"
+          />
+        </div>
 
-      {/* Starred Articles Card - Clickable (2 cols) */}
-      <Link href="/dashboard/starred" className="@container/card @5xl/main:col-span-2">
-        <Card className="cursor-pointer transition-all hover:bg-muted/50">
-          <CardHeader>
-            <CardDescription>Starred Articles</CardDescription>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {stats.starred.toLocaleString()}
-            </CardTitle>
-            <CardAction>
-              <Badge variant="outline" className="text-yellow-600 dark:text-yellow-400">
-                <IconStarFilled className="size-4" />
-                Favorites
-              </Badge>
-            </CardAction>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1.5 text-sm">
-            <div className="line-clamp-1 flex gap-2 font-medium">
-              Your starred articles
-            </div>
-            <div className="text-muted-foreground">
-              Click to view starred articles
-            </div>
-          </CardFooter>
-        </Card>
-      </Link>
-    </div>
+        {/* Opportunities Radial Card - Row 1, 1 col */}
+        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
+          <RadialStatCard
+            title="Opportunities"
+            value={stats.opportunities}
+            total={stats.total}
+            color="hsl(var(--chart-2))"
+            icon={<IconSparkles className="size-5 text-green-600 dark:text-green-400" />}
+            href="/dashboard/opportunities"
+          />
+        </div>
+
+        {/* Neutral Radial Card - Row 2, 1 col */}
+        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1 @5xl/main:col-start-7">
+          <RadialStatCard
+            title="Neutral"
+            value={stats.neutral}
+            total={stats.total}
+            color="hsl(var(--chart-3))"
+            icon={<IconCircle className="size-5 text-blue-600 dark:text-blue-400" />}
+            href="/dashboard/neutral"
+          />
+        </div>
+
+        {/* Articles Pending Classification Card - Row 2, 1 col */}
+        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
+          <RadialStatCard
+            title="Pending"
+            value={stats.unclassified}
+            total={stats.total}
+            color="hsl(var(--chart-4))"
+            icon={<IconClock className="size-5 text-orange-600 dark:text-orange-400" />}
+            href="/dashboard/backlog"
+          />
+        </div>
+      </div>
     </>
   )
 }
