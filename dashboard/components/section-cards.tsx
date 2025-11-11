@@ -52,10 +52,10 @@ export function SectionCards({ stats }: SectionCardsProps) {
 
   return (
     <>
-      {/* New Grid Layout: 8 columns, 2 rows */}
+      {/* New Grid Layout: 8 columns, 2 rows - Left side (4 cols) for main cards, Right side (4 cols) for radial charts */}
       <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-8 @5xl/main:grid-rows-2">
 
-        {/* Total Articles Card - Row 1, 2 cols */}
+        {/* Row 1 Left: Total Articles Card - 2 cols */}
         <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
           <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
             <CardHeader>
@@ -81,7 +81,7 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </Card>
         </Link>
 
-        {/* Added Today Card - Row 1, 2 cols */}
+        {/* Row 1 Left: Added Today Card - 2 cols */}
         <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
           <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
             <CardHeader>
@@ -107,8 +107,32 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </Card>
         </Link>
 
-        {/* Starred Articles Card - 2 cols, 2 rows high */}
-        <Link href="/dashboard/starred" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-2">
+        {/* Row 1 Right: Threats Radial Card - 2 cols */}
+        <div className="@5xl/main:col-span-2 @5xl/main:row-span-1">
+          <RadialStatCard
+            title="Threats"
+            value={stats.threats}
+            total={stats.total}
+            color="hsl(var(--chart-1))"
+            icon={<IconAlertTriangle className="size-5 text-red-600 dark:text-red-400" />}
+            href="/dashboard/threats"
+          />
+        </div>
+
+        {/* Row 1 Right: Opportunities Radial Card - 2 cols */}
+        <div className="@5xl/main:col-span-2 @5xl/main:row-span-1">
+          <RadialStatCard
+            title="Opportunities"
+            value={stats.opportunities}
+            total={stats.total}
+            color="hsl(var(--chart-2))"
+            icon={<IconSparkles className="size-5 text-green-600 dark:text-green-400" />}
+            href="/dashboard/opportunities"
+          />
+        </div>
+
+        {/* Row 2 Left: Starred Articles Card - 4 cols wide */}
+        <Link href="/dashboard/starred" className="@container/card @5xl/main:col-span-4 @5xl/main:row-span-1">
           <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
             <CardHeader>
               <CardDescription>Starred Articles</CardDescription>
@@ -133,32 +157,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
           </Card>
         </Link>
 
-        {/* Threats Radial Card - Row 1, 1 col */}
-        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
-          <RadialStatCard
-            title="Threats"
-            value={stats.threats}
-            total={stats.total}
-            color="hsl(var(--chart-1))"
-            icon={<IconAlertTriangle className="size-5 text-red-600 dark:text-red-400" />}
-            href="/dashboard/threats"
-          />
-        </div>
-
-        {/* Opportunities Radial Card - Row 1, 1 col */}
-        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
-          <RadialStatCard
-            title="Opportunities"
-            value={stats.opportunities}
-            total={stats.total}
-            color="hsl(var(--chart-2))"
-            icon={<IconSparkles className="size-5 text-green-600 dark:text-green-400" />}
-            href="/dashboard/opportunities"
-          />
-        </div>
-
-        {/* Neutral Radial Card - Row 2, 1 col */}
-        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1 @5xl/main:col-start-7">
+        {/* Row 2 Right: Neutral Radial Card - 2 cols */}
+        <div className="@5xl/main:col-span-2 @5xl/main:row-span-1">
           <RadialStatCard
             title="Neutral"
             value={stats.neutral}
@@ -169,8 +169,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
           />
         </div>
 
-        {/* Articles Pending Classification Card - Row 2, 1 col */}
-        <div className="@5xl/main:col-span-1 @5xl/main:row-span-1">
+        {/* Row 2 Right: Articles Pending Classification Card - 2 cols */}
+        <div className="@5xl/main:col-span-2 @5xl/main:row-span-1">
           <RadialStatCard
             title="Pending"
             value={stats.unclassified}
