@@ -11,3 +11,5 @@ __pycache__/
 fetch_rss_feeds.py
 python-db-setup.py
 LLM-classifier.py
+node_modules/
+users.sql
