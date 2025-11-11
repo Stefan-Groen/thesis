@@ -16,6 +16,8 @@
  * ```
  */
 
+"use client"
+
 import Link from "next/link"
 import { IconAlertTriangle, IconSparkles, IconNews, IconCircle, IconCalendarEvent, IconStarFilled, IconClock } from "@tabler/icons-react"
 import type { Stats } from "@/lib/types"
@@ -30,6 +32,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { RadialStatCard } from "@/components/radial-stat-card"
+import CountUp from "@/components/count-up"
 
 // Props interface (like function parameters with type hints)
 interface SectionCardsProps {
@@ -57,53 +60,53 @@ export function SectionCards({ stats }: SectionCardsProps) {
 
         {/* Row 1 Left: Total Articles Card - 2 cols */}
         <Link href="/dashboard/articles" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
-          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
-            <CardHeader>
-              <CardDescription>Total Articles</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                {stats.total.toLocaleString()}
-              </CardTitle>
-              <CardAction>
-                <Badge variant="outline">
-                  <IconNews className="size-4" />
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full overflow-hidden relative">
+            <div className="absolute top-4 left-4 z-10">
+              <div className="flex items-center gap-2 mb-2">
+                <IconNews className="size-5 text-primary" />
+                <Badge variant="outline" className="text-xs">
                   All Time
                 </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
-              <div className="line-clamp-1 flex gap-2 font-medium">
-                Total articles in database
               </div>
-              <div className="text-muted-foreground">
-                Click to view all articles
-              </div>
-            </CardFooter>
+              <CardTitle className="text-lg font-semibold mb-1">Total Articles</CardTitle>
+              <CardDescription className="text-xs">All articles in database</CardDescription>
+            </div>
+            <div className="absolute bottom-2 right-4 opacity-90">
+              <CountUp
+                from={0}
+                to={stats.total}
+                separator=","
+                direction="up"
+                duration={1.5}
+                className="text-7xl font-black tabular-nums text-foreground/30"
+              />
+            </div>
           </Card>
         </Link>
 
         {/* Row 1 Left: Added Today Card - 2 cols */}
         <Link href="/dashboard/today" className="@container/card @5xl/main:col-span-2 @5xl/main:row-span-1">
-          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full">
-            <CardHeader>
-              <CardDescription>Added Today</CardDescription>
-              <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-                {stats.articlesToday.toLocaleString()}
-              </CardTitle>
-              <CardAction>
-                <Badge variant="outline">
-                  <IconCalendarEvent className="size-4" />
+          <Card className="cursor-pointer transition-all hover:bg-muted/50 h-full overflow-hidden relative">
+            <div className="absolute top-4 left-4 z-10">
+              <div className="flex items-center gap-2 mb-2">
+                <IconCalendarEvent className="size-5 text-primary" />
+                <Badge variant="outline" className="text-xs">
                   Today
                 </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className="flex-col items-start gap-1.5 text-sm">
-              <div className="line-clamp-1 flex gap-2 font-medium">
-                Articles published today
               </div>
-              <div className="text-muted-foreground">
-                Click to view today's articles
-              </div>
-            </CardFooter>
+              <CardTitle className="text-lg font-semibold mb-1">Added Today</CardTitle>
+              <CardDescription className="text-xs">Articles published today</CardDescription>
+            </div>
+            <div className="absolute bottom-2 right-4 opacity-90">
+              <CountUp
+                from={0}
+                to={stats.articlesToday}
+                separator=","
+                direction="up"
+                duration={1.5}
+                className="text-7xl font-black tabular-nums text-foreground/30"
+              />
+            </div>
           </Card>
         </Link>
 
