@@ -77,8 +77,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
                 to={stats.total}
                 separator=","
                 direction="up"
-                duration={1.5}
-                className="text-7xl font-black tabular-nums text-foreground/30"
+                duration={0.8}
+                className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent"
               />
             </div>
           </Card>
@@ -103,8 +103,8 @@ export function SectionCards({ stats }: SectionCardsProps) {
                 to={stats.articlesToday}
                 separator=","
                 direction="up"
-                duration={1.5}
-                className="text-7xl font-black tabular-nums text-foreground/30"
+                duration={0.8}
+                className="text-7xl font-black tabular-nums [-webkit-text-stroke:2px_currentColor] [text-stroke:2px_currentColor] text-transparent dark:text-transparent"
               />
             </div>
           </Card>

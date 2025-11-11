@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useMemo } from "react"
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
 import {
   Card,
@@ -35,6 +36,9 @@ export function RadialStatCard({
 }: RadialStatCardProps) {
   const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0'
 
+  // Generate stable ID based on title
+  const chartId = useMemo(() => `chart-${title.toLowerCase().replace(/\s+/g, '-')}`, [title])
+
   // Simple chart data - just the value for display
   const chartData = [{
     value: 100 // Full semicircle
@@ -61,6 +65,7 @@ export function RadialStatCard({
           <ChartContainer
             config={chartConfig}
             className="mx-auto w-full max-w-[200px] h-[140px]"
+            id={chartId}
           >
             <RadialBarChart
               data={chartData}
