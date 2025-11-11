@@ -57,10 +57,10 @@ export function RadialStatCard({
           </div>
           <CardDescription className="text-xs">{percentage}% of total</CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center pb-2">
+        <CardContent className="flex items-end justify-center pb-0 pt-0">
           <ChartContainer
             config={chartConfig}
-            className="mx-auto aspect-square w-full max-w-[180px]"
+            className="mx-auto w-full max-w-[200px] h-[120px]"
           >
             <RadialBarChart
               data={chartData}
